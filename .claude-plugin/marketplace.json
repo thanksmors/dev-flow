@@ -1,6 +1,8 @@
 {
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "dev-flow-marketplace",
-  "description": "Local marketplace for dev-flow v2",
+  "version": "1.0.0",
+  "description": "Multi-session development workflow: 8 structured phases, sequential subagent execution with per-task spec+quality review, opinionated preferences system, Engram memory integration, progressive deployment, TDD discipline, C4 documentation, HARD-GATE enforcement, and autonomous fix loops.",
   "owner": {
     "name": "mors",
     "email": ""
@@ -10,7 +12,17 @@
       "name": "dev-flow",
       "description": "Multi-session development workflow with 8 phases, three execution modes, and Engram memory integration.",
       "version": "2.0.0",
-      "source": "./"
+      "source": {
+        "source": "github",
+        "repo": "thanksmors/dev-flow"
+      },
+      "author": {
+        "name": "mors",
+        "email": ""
+      },
+      "license": "MIT",
+      "keywords": ["workflow", "development", "automation", "agents"],
+      "category": "developer-tools"
     }
   ]
 }
