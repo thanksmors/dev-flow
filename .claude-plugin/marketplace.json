@@ -10,7 +10,10 @@
       "name": "dev-flow",
       "description": "Multi-session development workflow with 8 phases, three execution modes, and Engram memory integration.",
       "version": "2.0.0",
-      "source": "https://github.com/thanksmors/dev-flow"
+      "source": {
+        "source": "url",
+        "url": "https://github.com/thanksmors/dev-flow.git"
+      }
     }
   ]
 }
