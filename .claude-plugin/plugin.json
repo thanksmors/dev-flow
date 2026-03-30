@@ -10,12 +10,5 @@
   "source": {
     "github": "thanksmors/dev-flow"
   },
-  "commands": [
-    {
-      "name": "dev-flow",
-      "description": "Multi-session dev workflow with 8 phases, sequential subagents, opinionated preferences, Engram memory, progressive deployment, TDD, C4 docs, quality gates, and autonomous fix loops",
-      "argument-hint": "[continue|end]",
-      "source": "commands/dev-flow.md"
-    }
-  ]
+  "commands": ["./commands"]
 }
