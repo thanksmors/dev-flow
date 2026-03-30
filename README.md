@@ -24,9 +24,8 @@ Dev Flow keeps you in control across multiple sessions — it remembers where yo
 ## Quick Start
 
 ```bash
-# Install from GitHub
-/plugin marketplace add https://raw.githubusercontent.com/thanksmors/dev-flow/main/.claude-plugin/marketplace.json
-/plugin install dev-flow
+# Install directly from GitHub
+/plugin install https://github.com/thanksmors/dev-flow
 
 # Start a new workflow
 /dev-flow
