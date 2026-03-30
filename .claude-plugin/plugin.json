@@ -7,7 +7,6 @@
     "email": ""
   },
   "license": "MIT",
-  "marketplace": "./marketplace.json",
   "commands": "./commands/",
   "skills": "./skills/"
 }
