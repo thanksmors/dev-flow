@@ -6,7 +6,5 @@
     "name": "mors",
     "email": ""
   },
-  "license": "MIT",
-  "commands": "./commands/",
-  "skills": "./skills/"
+  "license": "MIT"
 }

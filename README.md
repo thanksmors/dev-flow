@@ -23,22 +23,8 @@ Dev Flow keeps you in control across multiple sessions — it remembers where yo
 
 ## Installation
 
-Dev Flow is not yet available via marketplace. Install manually:
-
 ```bash
-# Clone the repo to your plugins cache
-git clone https://github.com/thanksmors/dev-flow.git ~/.cc-mirror/minimax/config/plugins/cache/dev-flow
-
-# Then load it by running Claude Code from the dev-flow directory:
-cd ~/.cc-mirror/minimax/config/plugins/cache/dev-flow
-```
-
-Or add to your project's `.claude/` commands directory:
-
-```bash
-# In your project directory
-mkdir -p .claude/commands
-git clone https://github.com/thanksmors/dev-flow.git .claude/dev-flow
+/plugin install https://github.com/thanksmors/dev-flow
 ```
 
 ## Quick Start
