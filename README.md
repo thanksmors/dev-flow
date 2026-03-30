@@ -23,12 +23,9 @@ Dev Flow keeps you in control across multiple sessions — it remembers where yo
 
 ## Quick Start
 
-> [!NOTE]
-> The path below must be the absolute path to the dev-flow directory on your machine.
-
 ```bash
-# Install
-/plugin marketplace add /home/mors/Projects/dtt-ultrainstinct/dev-flow/.claude-plugin/marketplace.json
+# Install from GitHub
+/plugin marketplace add https://raw.githubusercontent.com/thanksmors/dev-flow/main/.claude-plugin/marketplace.json
 /plugin install dev-flow
 
 # Start a new workflow
