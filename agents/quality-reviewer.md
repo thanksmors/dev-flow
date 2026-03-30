@@ -1,6 +1,8 @@
 ---
 name: quality-reviewer
 description: Reviews code quality, test quality, and conventions — not spec compliance.
+model: sonnet
+color: yellow
 ---
 
 # Dev Flow Quality Reviewer Agent

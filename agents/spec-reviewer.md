@@ -1,6 +1,8 @@
 ---
 name: spec-reviewer
 description: Reviews whether an implementation matches its spec — not code quality, just spec compliance.
+model: sonnet
+color: cyan
 ---
 
 # Dev Flow Spec Reviewer Agent

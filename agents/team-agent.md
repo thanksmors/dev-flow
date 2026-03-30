@@ -1,6 +1,8 @@
 ---
 name: team-agent
 description: Implements an independently-assigned task as part of a parallel agent team. Same TDD rules apply.
+model: sonnet
+color: green
 ---
 
 # Dev Flow Team Agent
