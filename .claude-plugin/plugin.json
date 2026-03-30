@@ -1,7 +1,7 @@
 {
   "name": "dev-flow",
   "description": "Multi-session development workflow: 8 structured phases, sequential subagent execution with per-task spec+quality review, opinionated preferences system, Engram memory integration, progressive deployment, TDD discipline, C4 documentation, HARD-GATE enforcement, and autonomous fix loops.",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "author": {
     "name": "mors",
     "email": ""
@@ -9,5 +9,13 @@
   "license": "MIT",
   "source": {
     "github": "thanksmors/dev-flow"
-  }
+  },
+  "commands": [
+    {
+      "name": "dev-flow",
+      "description": "Multi-session dev workflow with 8 phases, sequential subagents, opinionated preferences, Engram memory, progressive deployment, TDD, C4 docs, quality gates, and autonomous fix loops",
+      "argument-hint": "[continue|end]",
+      "source": "commands/dev-flow.md"
+    }
+  ]
 }
