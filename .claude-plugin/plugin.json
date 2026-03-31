@@ -10,17 +10,5 @@
   "source": {
     "github": "thanksmors/dev-flow"
   },
-  "commands": ["./commands"],
-  "hooks": [
-    {
-      "name": "precompact-save-state",
-      "events": ["PreCompact"],
-      "script": "./hooks/precompact-save-state.py"
-    },
-    {
-      "name": "sessionstart-restore-state",
-      "events": ["SessionStart"],
-      "script": "./hooks/sessionstart-restore-state.py"
-    }
-  ]
+  "commands": ["./commands"]
 }
