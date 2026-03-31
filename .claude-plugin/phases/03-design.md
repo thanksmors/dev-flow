@@ -315,6 +315,26 @@ Before checkpoint, verify:
 - [ ] Deferred decisions are documented with adapter interfaces AND added to `.dev-flow/architecture/deferred-decisions.md` tracker
 - [ ] All artifacts are referenced in `state.json`
 - [ ] ADRs written for all significant decisions (one file per decision in `docs/decisions/`)
+- [ ] User manual draft: `docs/superpowers/specs/YYYY-MM-DD-<project>-user-manual.md`
+  Written in Phase 3 once UI/UX is understood. Describes user-facing flows
+  (screens, inputs, outputs) with no implementation details. Cross-reference
+  acceptance criteria to user manual sections in the design spec.
+
+## User Manual Template
+
+The user manual lives at `docs/superpowers/specs/YYYY-MM-DD-<project>-user-manual.md`.
+
+Structure:
+- **Overview**: what the app does, who uses it, core value (1 paragraph)
+- **First-Time Setup**: step-by-step first-run experience
+- **Core User Flows**: numbered steps for each major flow (what user does → what app shows)
+- **Input Reference**: all user inputs with format and validation rules
+- **Output Reference**: what the user sees after each action (success, error, empty state)
+- **Error States**: what goes wrong and how to recover
+
+The user manual is user-facing prose only. No code, no component names, no architecture.
+It is a cross-reference artifact — acceptance criteria in the design spec reference
+user manual sections, and Phase 6/7 verification traces back to user flows.
 
 ## C4 Loop Check
 
