@@ -1,7 +1,7 @@
 {
   "name": "dev-flow",
-  "description": "Multi-session development workflow: 8 structured phases, sequential subagent execution with per-task spec+quality review, opinionated preferences system, Engram memory integration, progressive deployment, TDD discipline, C4 documentation, HARD-GATE enforcement, and autonomous fix loops.",
-  "version": "2.0.1",
+  "description": "Multi-session development workflow: 8 structured phases, sequential subagent execution with per-task spec+quality review, opinionated preferences system, Engram memory integration, progressive deployment, TDD discipline, C4 documentation, HARD-GATE enforcement, autonomous fix loops, and context survival hooks.",
+  "version": "2.1.0",
   "author": {
     "name": "mors",
     "email": ""
@@ -10,5 +10,17 @@
   "source": {
     "github": "thanksmors/dev-flow"
   },
-  "commands": ["./commands"]
+  "commands": ["./commands"],
+  "hooks": [
+    {
+      "name": "precompact-save-state",
+      "events": ["PreCompact"],
+      "script": "./hooks/precompact-save-state.py"
+    },
+    {
+      "name": "sessionstart-restore-state",
+      "events": ["SessionStart"],
+      "script": "./hooks/sessionstart-restore-state.py"
+    }
+  ]
 }
