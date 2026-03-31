@@ -57,44 +57,14 @@ Before Phase 6 begins, confirm Phase 0 prerequisites passed. If not yet run:
 
 ## 6.0 Pre-Flight Check (HARD-GATE)
 
-**Before any task runs, scan the full implementation plan for missing dependencies.**
+**Before any task runs, run the gate script.**
 
-### 6.0.1 Env Var and Third-Party Dependency Scan
+Run: `python3 ${CLAUDE_PLUGIN_ROOT}/gates/gate_phase6_start.py`
 
-Read `docs/superpowers/plans/implementation.md` (or the active plan path in state.json).
-Scan all tasks for:
-- `process.env.*` references → check if the env var is set in `.env` or `.env.example`
-- Third-party service URLs (API endpoints, database connection strings, OAuth provider configs)
-- Adapter references: any adapter in the deferred-decisions tracker with Status = `fake`
+- Exit 0 → pre-flight passed. Show "✅ Pre-flight passed" and proceed to Step 6.1.
+- Exit 1 → pre-flight failed. Print the gate's output and pause. User resolves, then runs `/dev-flow continue`.
 
-### 6.0.2 If Anything Is Missing
-
-1. **Pause the workflow** — do NOT dispatch any implementer subagents.
-2. **Present the missing dependency list:**
-
-```
-⚠️ Pre-flight failed — missing dependencies:
-
-Env vars referenced but not configured:
-  STRIPE_SECRET_KEY  — used in PaymentAdapter (task N)
-  DATABASE_URL       — used in UserRepository (task N)
-
-Third-party services not yet configured:
-  SendGrid — EmailAdapter fake still wired (swap before Phase 6 begins)
-
-Resolve these before continuing. Run `/dev-flow continue` once ready.
-```
-
-3. **Resume** runs the pre-flight check again from the top.
-
-### 6.0.3 If All Clear
-
-Show: "✅ Pre-flight passed — no missing env vars or third-party dependencies detected."
-Proceed directly to Step 6.1 (Execution Mode).
-
-### Implementation Note
-
-This is a **HARD-GATE** — the workflow does not proceed to Step 6.1 until pre-flight passes. No warning, no override. The scan logic is: read the plan, grep for `process.env`, check `.env` for existence. If unsure whether an env var is configured, treat it as missing.
+This is a **HARD-GATE** — no implementer subagents dispatch until pre-flight passes.
 
 ## 6.1 Execution Mode
 
@@ -432,65 +402,14 @@ After each task that introduces architectural changes, update `docs/workspace.ds
 
 ## 6.4 Deferred-Decision Gate (HARD-GATE)
 
-**After all Phase 6 tasks complete, before the Phase 7 checkpoint — this section MUST run.**
+**After all Phase 6 tasks complete, before the Phase 7 checkpoint.**
 
-### 6.4.1 Read the Tracker
+Run: `python3 ${CLAUDE_PLUGIN_ROOT}/gates/gate_phase6_end.py`
 
-The tracker at `.dev-flow/architecture/deferred-decisions.md` was created at Phase 3 when each decision was first deferred. Read it now to see all open items.
+- Exit 0 → all deferred decisions resolved. Proceed directly to the Phase 7 checkpoint.
+- Exit 1 → open items remain. For each open item, present the user with: Resolve / Re-defer / Skip. After all items are handled, re-run the gate. Only proceed when the gate exits 0.
 
-### 6.4.2 If No Open Deferred Decisions
-
-Show: "No open deferred decisions. Proceeding to Phase 7 checkpoint."
-Continue to the Phase 7 checkpoint immediately.
-
-### 6.4.3 If Open Deferred Decisions Exist
-
-**Present each one, one at a time.** For each, show:
-
-```
-Deferred Decision: {AdapterName}
-Current status: {fake|pending}
-Deferred to: {what it's deferred to}
-Original trigger: {trigger criteria from tracker}
-
-Options:
-  [1] Resolve — swap fake→real adapter now
-  [2] Re-defer — keep open, update trigger criteria with new reason
-  [3] Skip — mark as closed with documented reason
-```
-
-**Option 1 — Resolve:**
-Run the Swap Protocol from Step 6.4.5.
-
-**Option 2 — Re-defer:**
-- Ask the user to provide the new trigger criteria in plain text
-- Update the `Trigger Criteria` column in the tracker
-- Mark Status as `pending` (if it was `fake`)
-- Move to next item.
-
-**Option 3 — Skip:**
-- Require the user to type a brief reason (one sentence minimum)
-- Update the tracker's `Trigger Criteria` column with: "SKIPPED — {reason}"
-- Mark Status as `skipped`
-- Move to next item.
-
-### 6.4.4 Hard Gate Enforcement
-
-**This is a HARD-GATE on the Phase 7 checkpoint.** The standard checkpoint options (Continue / Pause / End) are NOT shown until ALL open deferred decisions have a final disposition (resolved, re-deferred, or skipped with reason).
-
-After the last item is handled:
-```
-All {N} deferred decisions handled.
-Proceeding to Phase 7 checkpoint.
-```
-
-### 6.4.5 Swap Protocol
-
-1. Mark the fake as `@deprecated use XyzAdapter`
-2. Create the real adapter implementing the same port interface
-3. Swap the DI binding (one line in composition root)
-4. Run full test suite — all must pass
-5. Update the deferred-decisions tracker: set **Status** to `swapped`, **Swapped On** to today's date
+This is a **HARD-GATE on the Phase 7 checkpoint.** The standard checkpoint options are NOT shown until the gate exits 0.
 
 ## 6.5 E2E Verification
 
