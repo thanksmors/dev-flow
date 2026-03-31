@@ -66,6 +66,9 @@ See `skills/frontend-design/` for the full design reference (powered by [Impecca
 - **State persistence** — Resumes exactly where you left off
 - **Preference system** — Tech stack, testing, and style defaults
 - **HARD-GATE enforcement** — Phase 5b, 7, and 8 block progress until verified
+- **Python gate scripts** — Deterministic pre-flight checks for env vars, ports, fake adapters, and deferred decisions (`gates/`)
+- **Autonomous fix loop** — Gate failures trigger up to 2 rounds of fix agents before stopping; only escalates to user if both rounds fail
+- **Context survival hooks** — PreCompact saves session state; SessionStart restores context after compaction
 - **YOLO mode** — Auto-select decisions for faster execution
 - **Decision journal** — All significant decisions recorded with rationale
 - **ADR support** — Formal architecture decision records
