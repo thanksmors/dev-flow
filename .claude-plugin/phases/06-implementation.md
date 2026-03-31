@@ -55,6 +55,47 @@ Before Phase 6 begins, confirm Phase 0 prerequisites passed. If not yet run:
 4. Do NOT proceed until all checks pass
 </HARD-GATE>
 
+## 6.0 Pre-Flight Check (HARD-GATE)
+
+**Before any task runs, scan the full implementation plan for missing dependencies.**
+
+### 6.0.1 Env Var and Third-Party Dependency Scan
+
+Read `docs/superpowers/plans/implementation.md` (or the active plan path in state.json).
+Scan all tasks for:
+- `process.env.*` references → check if the env var is set in `.env` or `.env.example`
+- Third-party service URLs (API endpoints, database connection strings, OAuth provider configs)
+- Adapter references: any adapter in the deferred-decisions tracker with Status = `fake`
+
+### 6.0.2 If Anything Is Missing
+
+1. **Pause the workflow** — do NOT dispatch any implementer subagents.
+2. **Present the missing dependency list:**
+
+```
+⚠️ Pre-flight failed — missing dependencies:
+
+Env vars referenced but not configured:
+  STRIPE_SECRET_KEY  — used in PaymentAdapter (task N)
+  DATABASE_URL       — used in UserRepository (task N)
+
+Third-party services not yet configured:
+  SendGrid — EmailAdapter fake still wired (swap before Phase 6 begins)
+
+Resolve these before continuing. Run `/dev-flow continue` once ready.
+```
+
+3. **Resume** runs the pre-flight check again from the top.
+
+### 6.0.3 If All Clear
+
+Show: "✅ Pre-flight passed — no missing env vars or third-party dependencies detected."
+Proceed directly to Step 6.1 (Execution Mode).
+
+### Implementation Note
+
+This is a **HARD-GATE** — the workflow does not proceed to Step 6.1 until pre-flight passes. No warning, no override. The scan logic is: read the plan, grep for `process.env`, check `.env` for existence. If unsure whether an env var is configured, treat it as missing.
+
 ## 6.1 Execution Mode
 
 Only one mode exists:
@@ -337,7 +378,7 @@ This report becomes the input for the Phase 6 Adjustment Gate (section 6.8).
 **Context:** Task {N} — {what was being attempted}
 ```
 
-### 6.8 — Phase 6 Adjustment Gate
+### 6.9 — Phase 6 Adjustment Gate
 
 After Phases 1-5 complete and before any Phase 6 task begins (including on resume from revert):
 
@@ -357,7 +398,7 @@ Proceed to next task.
 
 ---
 
-## 6.4 C4 Workspace Sync
+## 6.3 C4 Workspace Sync
 
 After each task that introduces architectural changes, update `docs/workspace.dsl`:
 
@@ -389,7 +430,7 @@ After each task that introduces architectural changes, update `docs/workspace.ds
 **What NOT to document (component-identification scoring ≤ 1):**
 - DTOs, value objects without validation, test classes, factories
 
-## 6.5 Deferred Decision Swaps
+## 6.4 Deferred Decision Swaps
 
 After ALL tasks complete (regardless of mode), review each deferred decision and execute the Swap Protocol where applicable.
 
@@ -479,7 +520,7 @@ Run full test suite after each swap. All tests must pass before the swap is cons
 
 ---
 
-## 6.6 E2E Verification
+## 6.5 E2E Verification
 
 <HARD-GATE — Playwright must be installed>
 Before running expect, verify Playwright is installed:
@@ -492,7 +533,7 @@ If not installed → run setup steps before proceeding.
 
 **What:** Run `expect-cli` against the full branch diff to generate and execute browser smoke tests.
 
-### 6.6.1 Setup (One-time per project)
+### 6.5.1 Setup (One-time per project)
 
 ```bash
 npm install -D @playwright/test
@@ -508,7 +549,7 @@ Add to `package.json` scripts:
 }
 ```
 
-### 6.6.2 Generate and Run
+### 6.5.2 Generate and Run
 
 ```bash
 # Interactive (review plan before running)
@@ -525,13 +566,13 @@ expect-cli -t branch -y
 4. Playwright tests are generated and executed in a real browser
 5. Session is recorded for replay
 
-### 6.6.3 Generated Test Location
+### 6.5.3 Generated Test Location
 
 Generated tests are saved to `tests/e2e/expect-[slug].ts` where `[slug]` is the flow name from the diff analysis. Each flow is a separate file.
 
 **Commit generated tests.** They are regression tests — real browser coverage that prevents UI regressions. Without committing, the coverage disappears on the next run.
 
-### 6.6.4 Re-running Existing Flows
+### 6.5.4 Re-running Existing Flows
 
 To replay an existing flow without regenerating:
 ```bash
@@ -543,7 +584,7 @@ To update an existing flow (re-generate from current diff):
 expect-cli -f [slug] -t branch -y
 ```
 
-### 6.6.5 CI Integration
+### 6.5.5 CI Integration
 
 Add to CI pipeline after Phase 6 verification:
 
@@ -557,14 +598,14 @@ Add to CI pipeline after Phase 6 verification:
 
 `expect-cli -y` exits 0 on success, 1 on failure — standard CI signal.
 
-### 6.6.6 Relationship to TDD
+### 6.5.6 Relationship to TDD
 
 E2E verification with `expect` does NOT replace TDD. The order is:
 
 ```
 TDD (unit + integration tests written BEFORE implementation)
   → implementation tasks
-  → Phase 6.6 E2E Verification (expect reads diff, generates browser smoke)
+  → Phase 6.5 E2E Verification (expect reads diff, generates browser smoke)
   → Phase 7 Gap Analysis
 ```
 
@@ -572,7 +613,7 @@ Unit and integration tests are written first (TDD). `expect` generates browser t
 
 ---
 
-## 6.7 Design Compliance Review
+## 6.6 Design Compliance Review
 
 **When:** After ALL implementation tasks are complete (after the per-task loop exits), before the Quality Gate and Checkpoint.
 
@@ -596,7 +637,7 @@ Unit and integration tests are written first (TDD). `expect` generates browser t
 
 ---
 
-## Quality Gate
+## 6.7 Quality Gate
 
 Before Phase 7, verify ALL of the following:
 
@@ -625,7 +666,7 @@ Before Phase 7, verify ALL of the following:
 
 ---
 
-## Engram Save
+## 6.8 Engram Save
 
 ```
 mem_save key: {engramProjectKey}-phase6
