@@ -49,6 +49,12 @@ Check for project preferences:
 - If `.dev-flow/preferences/` exists in the project root AND contains at least one `.md` file → **project preferences found**
 - Otherwise → **no project preferences, use plugin defaults**
 
+### Step 0.1a — Resolve plugin root
+The plugin root is `${CLAUDE_PLUGIN_ROOT}`. If this env var is not set, resolve it by:
+1. Looking for a known marker file: `${CLAUDE_PLUGIN_ROOT}/plugin.json`
+2. If not found, use the path where dev-flow.md is located as the plugin root
+If plugin root cannot be resolved, set it to the path where dev-flow.md is located.
+
 ### Step 0.2 — Load preferences
 
 **If project preferences found:**
@@ -66,8 +72,22 @@ Check for project preferences:
 
 **If no project preferences found:**
 1. Load all files from `${CLAUDE_PLUGIN_ROOT}/preferences/defaults/`
+After loading, count the .md files in `${CLAUDE_PLUGIN_ROOT}/preferences/defaults/`.
+Expected: 6 files (tech-stack.md, programming-style.md, testing.md,
+           libraries-and-mcps.md, setup-steps.md, user-profile.md)
+If not 6 files → print:
+  "Preference loading warning: expected 6 default files but found {N} at {path}.
+   Missing: {list of filenames not found}."
+Then proceed — do not block on this warning.
 2. Show one-line summary of the defaults:
    > "No preferences found. Defaults: Bun + Insforge + Nuxt layers + Nuxt UI, developer profile, YOLO off."
+If no project preferences found AND no defaults found:
+Print:
+  "No preferences found at:
+    Project: {project}/.dev-flow/preferences/
+    Plugin:  {plugin_root}/preferences/defaults/
+  Check that the plugin is correctly installed.
+  Proceeding with built-in defaults."
 3. Ask (AskUserQuestion):
    > "Save defaults and continue / Customize before saving / Skip preferences (use defaults this session only)"
    - **Save defaults** → copy defaults to `.dev-flow/preferences/`, proceed
