@@ -40,8 +40,11 @@ pinia (via @pinia/nuxt)
 # UI state local to a component or composable → composable-local ref/computed
 # Rule: if only one component needs it, it's not Pinia state
 
-## TypeScript
-strict: true always
+## Linting
+bun lint (oxlint)
+# bun lint runs oxlint on the project. Config file: oxlintrc.json in project root.
+# All TypeScript files must pass lint before Phase 7.
+# Fix violations: bun lint --fix (fixer-agent handles this in the fix loop)
 # zod: required for all user input validation and server route request body parsing
 # Layer boundary types: define explicit interfaces for what each layer exports
 # Never use `any` — use `unknown` and narrow it

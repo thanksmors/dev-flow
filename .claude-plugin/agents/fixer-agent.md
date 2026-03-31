@@ -87,6 +87,19 @@ Fix: this means the plugin is not correctly installed. Report `BLOCKED: plugin i
 
 Fix: run `gh auth login`. If interactive → report `BLOCKED: needs interactive gh auth — run gh auth login manually`.
 
+### `lint_clean` — Lint violations present
+
+Fix: run `bun lint --fix` to auto-fix violations.
+
+1. Check `bun` is available — `bun --version` exits 0
+2. Check project has an oxlintrc config — `oxlintrc.json` or `.oxlintrc` in project root
+3. Run `bun lint --fix .`
+4. Verify: run `bun lint .` — exit 0 = clean
+5. If `bun lint --fix` produced remaining output → PARTIAL with remaining output
+6. If `bun` not installed → report `BLOCKED: bun not installed — install bun first`
+
+**BLOCKED if:** bun is not installed. Do not attempt to run lint without bun.
+
 ### `git_remote` — No git remote configured
 
 Fix: run `git remote add origin <url>` with the URL provided or reported. If no URL → report `BLOCKED: needs repository URL`.
@@ -107,6 +120,7 @@ You MUST verify before reporting DONE:
 | port file created | `ls path/to/Port.ts` succeeds |
 | fake adapter created | `ls path/to/FakeXyzAdapter.ts` succeeds and compiles |
 | deferred decision resolved | gate_phase6_end.py exits 0 |
+| lint violations | `bun lint .` exits 0 |
 | gh auth | `gh auth status` exits 0 |
 | git remote | `git remote -v` shows origin |
 

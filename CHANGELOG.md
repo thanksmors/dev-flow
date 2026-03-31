@@ -8,16 +8,20 @@ All notable changes to dev-flow are documented here.
 
 - **Python gate scripts** — Deterministic HARD-GATE enforcement via standalone scripts in `gates/`:
   - `gate_phase0.py` — gh auth, git remote, plugin root (runs at Phase 0)
-  - `gate_phase5b.py` — plan exists, ports defined, fake adapters exist (runs at Phase 5b)
+  - `gate_phase5b.py` — plan exists, lint config, ports defined, fake adapters exist (runs at Phase 5b)
   - `gate_phase6_start.py` — env vars, third-party deps, fake adapter swaps (runs at Step 6.0)
   - `gate_phase6_end.py` — all deferred decisions resolved (runs at Section 6.4)
 
 - **Machine-readable JSON output** — All gate scripts emit structured JSON between `<!---\n` and `\n-->` with `status`, `gate`, `round`, `checks`, `failing_count`, and `fix_items` for autonomous parsing
 
+- **Lint gate (oxlint)** — `gate_phase5b.py` checks for `oxlintrc.json` or `.oxlintrc` in project root; fixer-agent handles `lint_clean` fix type by running `bun lint --fix` then verifying `bun lint .` exits 0
+
 - **Autonomous fix loop** — Gate failures trigger a 2-round fix loop before any stop:
-  - Round 1: up to 3 fix agents in parallel, one per failing check item
-  - Round 2: up to 2 agents with full context of what was tried
+  - Round 1: up to 3 fixer agents in parallel, one per failing check item
+  - Round 2: up to 2 fixer agents with full context of what was tried
   - Only stops and asks the user if both rounds fail
+
+- **fixer-agent.md** — Specialized agent for the fix loop. Handles all fix types: env vars, ports, fake adapters, lint_clean, deferred decisions, gh auth, git remote, plugin root. Round-aware, verifies before reporting done.
 
 - **Context survival hooks** — Plugin hooks survive Claude Code context compaction:
   - `PreCompact` hook saves session state to `.dev-flow/.last-compact.json`

@@ -117,6 +117,20 @@ def check_fake_adapters() -> dict:
         }
     return {"check": "fake_adapters", "status": "pass", "message": f"fake adapters: OK ({len(set(adapter_names))} referenced)", "fix": "", "missing": []}
 
+def check_lint_config() -> dict:
+    """oxlintrc.json or .oxlintrc should exist in project root."""
+    possible_paths = [PROJECT_ROOT / "oxlintrc.json", PROJECT_ROOT / ".oxlintrc"]
+    for p in possible_paths:
+        if p.exists():
+            return {"check": "lint_config", "status": "pass", "message": f"lint config: OK ({p.name})", "fix": "", "missing": []}
+    return {
+        "check": "lint_config",
+        "status": "fail",
+        "message": "lint config: oxlintrc.json or .oxlintrc not found in project root",
+        "fix": "Create a minimal oxlintrc.json in the project root",
+        "missing": [],
+    }
+
 def check_deferred_decisions_clean() -> dict:
     """No deferred decisions with Status=fake should be pending."""
     if not TRACKER_PATH.exists():
@@ -136,6 +150,7 @@ def check_deferred_decisions_clean() -> dict:
 def main() -> int:
     checks = [
         check_plan_exists(),
+        check_lint_config(),
         check_ports_defined(),
         check_fake_adapters(),
         check_deferred_decisions_clean(),
