@@ -190,6 +190,13 @@ In `.dev-flow/architecture/deferred-decisions.md`:
 
 Each deferred decision MUST include an adapter/interface design so the swap is clean.
 
+**IMPORTANT — populate the tracker immediately:** Every deferred decision identified in this phase (fake adapter, deferred DB choice, deferred auth provider, etc.) must be added to the tracker right now — not at Phase 6.5. The tracker is a living document from Phase 3 forward.
+
+For each deferred decision in this phase:
+1. Add a row to the tracker table
+2. Set initial Status: `fake` or `pending`
+3. Set the trigger criteria from what was documented above
+
 ### 3.8 Write Architecture Decision Records
 
 For every significant design choice made in steps 3.1–3.7, write a separate ADR file in `docs/decisions/`.
@@ -305,7 +312,7 @@ Before checkpoint, verify:
 - [ ] At least one ADR in `docs/decisions/` (`0001-approach-selection.md`)
 - [ ] Structurizr service added to docker-compose.yml (or standalone fallback documented)
 - [ ] At least one Mermaid sequence/flow diagram exists
-- [ ] Deferred decisions are documented with adapter interfaces
+- [ ] Deferred decisions are documented with adapter interfaces AND added to `.dev-flow/architecture/deferred-decisions.md` tracker
 - [ ] All artifacts are referenced in `state.json`
 - [ ] ADRs written for all significant decisions (one file per decision in `docs/decisions/`)
 

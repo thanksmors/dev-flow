@@ -436,8 +436,7 @@ After each task that introduces architectural changes, update `docs/workspace.ds
 
 ### 6.4.1 Read the Tracker
 
-Read `.dev-flow/architecture/deferred-decisions.md`.
-Count open items: any row where Status = `fake` or `pending`.
+The tracker at `.dev-flow/architecture/deferred-decisions.md` was created at Phase 3 when each decision was first deferred. Read it now to see all open items.
 
 ### 6.4.2 If No Open Deferred Decisions
 
