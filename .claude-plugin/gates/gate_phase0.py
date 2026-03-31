@@ -3,11 +3,13 @@
 
 import subprocess
 import sys
-import os
 import pathlib
 
 PLUGIN_ROOT = pathlib.Path(__file__).parent.parent.resolve()
 PROJECT_ROOT = pathlib.Path.cwd()
+
+sys.path.insert(0, str(pathlib.Path(__file__).parent))
+from _json_output import gate_exit
 
 def run(cmd: list[str], capture: bool = True) -> tuple[int, str]:
     try:
@@ -20,37 +22,49 @@ def run(cmd: list[str], capture: bool = True) -> tuple[int, str]:
     except Exception as e:
         return 1, str(e)
 
-def check_gh_auth() -> tuple[bool, str]:
+def check_gh_auth() -> dict:
     code, out = run(["gh", "auth", "status"])
     if code == 0:
-        return True, "gh auth: OK"
-    return False, f"gh auth: FAILED\n{out.strip()}"
+        return {"check": "gh_auth", "status": "pass", "message": "gh auth: OK", "fix": "", "missing": []}
+    return {
+        "check": "gh_auth",
+        "status": "fail",
+        "message": f"gh auth: FAILED\n{out.strip()}",
+        "fix": "Run `gh auth login` to authenticate with GitHub",
+        "missing": [],
+    }
 
-def check_git_remote() -> tuple[bool, str]:
+def check_git_remote() -> dict:
     code, out = run(["git", "remote", "-v"])
     if code == 0 and "origin" in out:
-        return True, f"git remote: OK ({out.strip().split()[1]})"
-    return False, f"git remote: not configured or not origin"
+        remote_url = out.strip().split()[1] if out.strip().split() else "unknown"
+        return {"check": "git_remote", "status": "pass", "message": f"git remote: OK ({remote_url})", "fix": "", "missing": []}
+    return {
+        "check": "git_remote",
+        "status": "fail",
+        "message": "git remote: not configured or no origin",
+        "fix": "Run `git remote add origin <url>` or `gh repo create` to set up a remote",
+        "missing": [],
+    }
 
-def check_plugin_root() -> tuple[bool, str]:
+def check_plugin_root() -> dict:
     root_file = PLUGIN_ROOT / "plugin.json"
     if root_file.exists():
-        return True, f"CLAUDE_PLUGIN_ROOT: OK ({PLUGIN_ROOT})"
-    return False, f"CLAUDE_PLUGIN_ROOT: not found at {PLUGIN_ROOT}"
+        return {"check": "plugin_root", "status": "pass", "message": f"CLAUDE_PLUGIN_ROOT: OK ({PLUGIN_ROOT})", "fix": "", "missing": []}
+    return {
+        "check": "plugin_root",
+        "status": "fail",
+        "message": f"CLAUDE_PLUGIN_ROOT: not found at {PLUGIN_ROOT}",
+        "fix": "Verify the plugin is correctly installed — plugin.json not found",
+        "missing": [],
+    }
 
 def main() -> int:
     checks = [check_gh_auth(), check_git_remote(), check_plugin_root()]
-    all_pass = True
-    for ok, msg in checks:
-        symbol = "✅" if ok else "❌"
-        print(msg)
-        if not ok:
-            all_pass = False
-    if all_pass:
-        print("\nGate Phase 0: PASS")
-        return 0
-    print("\nGate Phase 0: FAIL")
-    return 1
+    for c in checks:
+        symbol = "✅" if c["status"] == "pass" else "❌"
+        print(f"{symbol} {c['message']}")
+    return gate_exit("phase0", checks)
 
 if __name__ == "__main__":
     sys.exit(main())
