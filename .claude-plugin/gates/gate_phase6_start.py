@@ -6,10 +6,24 @@ import pathlib
 import re
 
 PROJECT_ROOT = pathlib.Path.cwd()
-PLAN_PATH = PROJECT_ROOT / "docs" / "superpowers" / "plans" / "implementation.md"
+PLANS_DIR = PROJECT_ROOT / "docs" / "superpowers" / "plans"
 ENV_PATH = PROJECT_ROOT / ".env"
 ENV_EXAMPLE_PATH = PROJECT_ROOT / ".env.example"
 TRACKER_PATH = PROJECT_ROOT / ".dev-flow" / "architecture" / "deferred-decisions.md"
+
+def find_latest_plan() -> pathlib.Path | None:
+    """Find the most recently modified .md plan file, excluding premortem plans."""
+    if not PLANS_DIR.exists():
+        return None
+    plan_files = [
+        f for f in PLANS_DIR.glob("*.md")
+        if "premortem" not in f.stem.lower()
+    ]
+    if not plan_files:
+        return None
+    return max(plan_files, key=lambda f: f.stat().st_mtime)
+
+PLAN_PATH = find_latest_plan()
 
 def load_env(path: pathlib.Path) -> dict[str, str]:
     """Parse a .env file into a dict of key=value."""
@@ -25,17 +39,36 @@ def load_env(path: pathlib.Path) -> dict[str, str]:
             env[key.strip()] = value.strip().strip('"').strip("'")
     return env
 
-def scan_env_references(plan_path: pathlib.Path) -> list[str]:
-    """Find process.env.* references in the plan file."""
-    if not plan_path.exists():
+def scan_env_references(plan_path: pathlib.Path | None) -> list[str]:
+    """Find process.env.* references in the plan file, skipping comments and code blocks."""
+    if plan_path is None or not plan_path.exists():
         return []
     content = plan_path.read_text()
-    refs = re.findall(r'process\.env\.([A-Z_][A-Z0-9_]*)', content)
+    refs = []
+    in_code_block = False
+    for line in content.splitlines():
+        stripped = line.strip()
+        # Track code block boundaries
+        if stripped.startswith('```'):
+            in_code_block = not in_code_block
+            continue
+        # Skip content inside code blocks
+        if in_code_block:
+            continue
+        # Skip markdown comment lines
+        if stripped.startswith('#'):
+            continue
+        # Skip markdown structural lines (headers, list items)
+        if stripped.startswith('- ') or stripped.startswith('* ') or stripped.startswith('|'):
+            continue
+        if 'process.env' in line:
+            found = re.findall(r'process\.env\.([A-Z_][A-Z0-9_]*)', line)
+            refs.extend(found)
     return list(set(refs))
 
-def scan_third_party_urls(plan_path: pathlib.Path) -> list[str]:
+def scan_third_party_urls(plan_path: pathlib.Path | None) -> list[str]:
     """Find third-party URLs referenced in the plan."""
-    if not plan_path.exists():
+    if plan_path is None or not plan_path.exists():
         return []
     content = plan_path.read_text()
     urls = re.findall(r'https?://[^\s<>"\')]+', content)
@@ -87,7 +120,7 @@ def check_third_party_urls() -> tuple[bool, list[str]]:
 
 def main() -> int:
     print("=== Gate Phase 6 Start: Pre-flight Check ===\n")
-    print(f"Plan: {PLAN_PATH}")
+    print(f"Plan: {PLAN_PATH.name if PLAN_PATH else 'none found'}")
     print(f"Env:  {ENV_PATH}\n")
 
     env_pass, missing_envs = check_env_vars()

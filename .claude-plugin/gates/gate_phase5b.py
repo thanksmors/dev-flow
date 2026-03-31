@@ -6,14 +6,30 @@ import pathlib
 import re
 
 PROJECT_ROOT = pathlib.Path.cwd()
-PLAN_PATH = PROJECT_ROOT / "docs" / "superpowers" / "plans" / "implementation.md"
+PLANS_DIR = PROJECT_ROOT / "docs" / "superpowers" / "plans"
 STATE_PATH = PROJECT_ROOT / ".dev-flow" / "state.json"
 TRACKER_PATH = PROJECT_ROOT / ".dev-flow" / "architecture" / "deferred-decisions.md"
 LAYERS_DIR = PROJECT_ROOT / "layers"
 
+def find_latest_plan() -> pathlib.Path | None:
+    """Find the most recently modified .md plan file, excluding premortem plans."""
+    if not PLANS_DIR.exists():
+        return None
+    plan_files = [
+        f for f in PLANS_DIR.glob("*.md")
+        if "premortem" not in f.stem.lower()
+    ]
+    if not plan_files:
+        return None
+    return max(plan_files, key=lambda f: f.stat().st_mtime)
+
+PLAN_PATH = find_latest_plan()
+
 def check_plan_exists() -> tuple[bool, str]:
+    if PLAN_PATH is None:
+        return False, f"implementation plan: NOT FOUND — no .md plan file in {PLANS_DIR} (excluding premortem)"
     if PLAN_PATH.exists():
-        return True, f"implementation plan: OK ({PLAN_PATH})"
+        return True, f"implementation plan: OK ({PLAN_PATH.name})"
     return False, f"implementation plan: NOT FOUND at {PLAN_PATH}"
 
 def check_ports_defined() -> tuple[bool, str]:
@@ -36,22 +52,35 @@ def check_ports_defined() -> tuple[bool, str]:
 
 def check_fake_adapters() -> tuple[bool, str]:
     """All fake adapters referenced in the plan should exist."""
-    if not PLAN_PATH.exists():
+    if not PLAN_PATH or not PLAN_PATH.exists():
         return True, "plan not found — skipping fake adapter check"
     content = PLAN_PATH.read_text()
     # Find adapter names in task descriptions (rough heuristic)
     adapter_names = re.findall(r'(?:Fake|Wire)[A-Z][a-zA-Z]+(?:Adapter|Port)?', content)
     if not adapter_names:
         return True, "fake adapters: none referenced in plan"
-    adapters_dir = LAYERS_DIR / "adapters" if LAYERS_DIR.exists() else None
-    if adapters_dir is None or not adapters_dir.exists():
-        return False, f"fake adapters: adapters dir not found at {adapters_dir}"
+    # Look in layers/*/adapters/ first, then src/adapters/
+    adapters_dirs = []
+    if LAYERS_DIR.exists():
+        adapters_dirs.extend(d.parent for d in LAYERS_DIR.rglob("adapters"))
+    src_adapters = PROJECT_ROOT / "src" / "adapters"
+    if src_adapters.exists():
+        adapters_dirs.append(src_adapters)
+    if not adapters_dirs:
+        return False, f"fake adapters: no adapters directory found (tried layers/*/adapters/, src/adapters/)"
     missing = []
+    found_dirs = []
     for name in set(adapter_names):
-        # Normalize: FakeXyzAdapter → FakeXyzAdapter.ts
-        expected = adapters_dir / f"{name}.ts"
-        if not expected.exists():
+        found = False
+        for ad in adapters_dirs:
+            expected = ad / f"{name}.ts"
+            if expected.exists():
+                found = True
+                break
+        if not found:
             missing.append(name)
+        else:
+            found_dirs.extend([ad for ad in adapters_dirs if (ad / f"{name}.ts").exists()])
     if missing:
         return False, f"fake adapters: missing — {', '.join(missing)}"
     return True, f"fake adapters: OK ({len(set(adapter_names))} referenced)"
