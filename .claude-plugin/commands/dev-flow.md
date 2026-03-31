@@ -114,7 +114,7 @@ After all files: write (overwrite) updated preferences to `.dev-flow/preferences
 Run: `python3 ${CLAUDE_PLUGIN_ROOT}/gates/gate_phase0.py`
 
 - Exit 0 → all checks passed. Proceed to Step 0.4b.
-- Exit 1 → gate failed. Print the gate's output. User resolves, then re-run the gate or run `/dev-flow continue`.
+- Exit 1 → gate failed. Print the gate's full output. Then tell the user: "Gate failed — fix the issues above, then run `/dev-flow continue` to re-run."
 
 This is a **HARD-GATE** — no further workflow steps until gate_phase0.py exits 0.
 

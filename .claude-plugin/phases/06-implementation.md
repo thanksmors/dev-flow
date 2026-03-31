@@ -62,7 +62,7 @@ Before Phase 6 begins, confirm Phase 0 prerequisites passed. If not yet run:
 Run: `python3 ${CLAUDE_PLUGIN_ROOT}/gates/gate_phase6_start.py`
 
 - Exit 0 → pre-flight passed. Show "✅ Pre-flight passed" and proceed to Step 6.1.
-- Exit 1 → pre-flight failed. Print the gate's output and pause. User resolves, then runs `/dev-flow continue`.
+- Exit 1 → gate failed. Print the gate's full output. Then tell the user: "Gate failed — fix the issues above, then run `/dev-flow continue` to re-run."
 
 This is a **HARD-GATE** — no implementer subagents dispatch until pre-flight passes.
 
@@ -407,7 +407,7 @@ After each task that introduces architectural changes, update `docs/workspace.ds
 Run: `python3 ${CLAUDE_PLUGIN_ROOT}/gates/gate_phase6_end.py`
 
 - Exit 0 → all deferred decisions resolved. Proceed directly to the Phase 7 checkpoint.
-- Exit 1 → open items remain. For each open item, present the user with: Resolve / Re-defer / Skip. After all items are handled, re-run the gate. Only proceed when the gate exits 0.
+- Exit 1 → gate failed. Print the gate's full output. For each open item, present the user with: Resolve / Re-defer / Skip. After all items are handled, re-run the gate. Only proceed when the gate exits 0. Tell the user: "Gate failed — handle each open item above, then run `/dev-flow continue` to re-run."
 
 This is a **HARD-GATE on the Phase 7 checkpoint.** The standard checkpoint options are NOT shown until the gate exits 0.
 
