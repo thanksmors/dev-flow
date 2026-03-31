@@ -67,15 +67,17 @@ Run: `python3 ${CLAUDE_PLUGIN_ROOT}/gates/gate_phase6_start.py`
 **Fix Loop — Round 1:**
 1. Parse the JSON block from the gate output (between `<!---\n` and `\n-->`)
 2. Extract `fix_items` — each item has `check`, `fix`, and optionally `missing`
-3. Dispatch one fix agent per failing item in parallel (max 3 agents)
-4. Each fix agent: reads the fix instruction, fixes the specific item, verifies the fix worked
+3. Dispatch one fixer agent per failing item in parallel (max 3 agents) using `${CLAUDE_PLUGIN_ROOT}/agents/fixer-agent.md`
+   - Each fixer receives: `fix_item` (check, fix, missing), `gate_name: "phase6_start"`, `round: 1`, `what_was_tried: []`
+4. Wait for all fixers to complete
 5. Re-run gate_phase6_start.py
 6. If exit 0 → print "✅ Gate fixed." Proceed to Step 6.1.
 7. If exit 1 → Round 2
 
 **Fix Loop — Round 2 (if Round 1 didn't resolve):**
-1. Re-parse JSON from gate output
-2. Remaining items are harder — dispatch up to 2 agents, each with full context of what was already tried
+1. Re-parse JSON from gate output — remaining items are the ones still failing
+2. Dispatch up to 2 fixer agents in parallel, each with full context of what Round 1 tried for this item
+   - Each fixer receives: `fix_item`, `gate_name: "phase6_start"`, `round: 2`, `what_was_tried: [round1 attempt summary]`
 3. Re-run gate_phase6_start.py
 4. If exit 0 → print "✅ Gate fixed after escalation." Proceed to Step 6.1.
 5. If exit 1 → present remaining issues to user. Options: [Pause] [End]
