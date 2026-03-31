@@ -430,95 +430,68 @@ After each task that introduces architectural changes, update `docs/workspace.ds
 **What NOT to document (component-identification scoring ≤ 1):**
 - DTOs, value objects without validation, test classes, factories
 
-## 6.4 Deferred Decision Swaps
+## 6.4 Deferred-Decision Gate (HARD-GATE)
 
-After ALL tasks complete (regardless of mode), review each deferred decision and execute the Swap Protocol where applicable.
+**After all Phase 6 tasks complete, before the Phase 7 checkpoint — this section MUST run.**
 
-### WHEN — Explicit Trigger Points
+### 6.4.1 Read the Tracker
 
-The swap from fake to real adapter happens at any of these three trigger points. One is sufficient:
+Read `.dev-flow/architecture/deferred-decisions.md`.
+Count open items: any row where Status = `fake` or `pending`.
 
-| Trigger | Condition | Who initiates |
-|---------|-----------|---------------|
-| **Task-level** | Feature works end-to-end with fake, tests pass, spec approved, quality approved. The swap is a natural follow-on micro-step within the task. | Implementer |
-| **Phase 6 end** | All tasks complete. Each fake adapter is evaluated: "Ready to swap for real?" | Orchestrator |
-| **Phase 7 gap analysis** | Gap flagged: "fake adapter still wired in production code path." Fix is swap + test verification. | Gap analysis loop |
+### 6.4.2 If No Open Deferred Decisions
 
-### WHERE — Exact Change Locations
+Show: "No open deferred decisions. Proceeding to Phase 7 checkpoint."
+Continue to the Phase 7 checkpoint immediately.
 
-| # | File | Action |
-|---|------|--------|
-| 1 | `layers/{domain}/adapters/FakeXyzAdapter.ts` | **Never deleted.** Mark `@deprecated use XyzAdapter`. Stays as regression reference. |
-| 2 | `layers/{domain}/adapters/XyzAdapter.ts` | **Created.** Implements the same port interface as the fake. |
-| 3 | `app/diComposition.ts` | **One-line change.** Swap the adapter binding. |
+### 6.4.3 If Open Deferred Decisions Exist
 
-The port interface **never changes.** The swap is exclusively a DI binding change + new file.
+**Present each one, one at a time.** For each, show:
 
-> **Port & adapter paths:** See `${CLAUDE_PLUGIN_ROOT}/references/layer-scaffold.md` for canonical locations (`layers/{domain}/ports/`, `layers/{domain}/adapters/`).
+```
+Deferred Decision: {AdapterName}
+Current status: {fake|pending}
+Deferred to: {what it's deferred to}
+Original trigger: {trigger criteria from tracker}
 
-### HOW — Step-by-Step Procedure
-
-1. **Mark the fake as deprecated**
-   ```typescript
-   /**
-    * @deprecated use XyzAdapter
-    * Kept as regression reference — do not delete
-    */
-   export class FakeXyzAdapter implements XyzPort { ... }
-   ```
-
-2. **Create the real adapter** implementing the same port interface
-   ```typescript
-   export class XyzAdapter implements XyzPort {
-     constructor(private readonly deps: XyzDeps) {}
-     // real implementation
-   }
-   ```
-
-3. **Swap the DI binding** (one line in composition root)
-   ```typescript
-   // Before
-   bind(XyzPort).to(FakeXyzAdapter).inRequestScope()
-   // After
-   bind(XyzPort).to(XyzAdapter).inRequestScope()
-   ```
-
-4. **Run full test suite** — all tests must pass with real adapter wired. If tests fail, the adapter is not complete.
-
-5. **Update the deferred-decisions tracker** — mark the adapter row as resolved:
-   - Set **Status** to `swapped`
-   - Set **Swapped On** to today's date
-   - If the port interface required adjustment: write an ADR and note it in the adapter row
-
-6. **Write an ADR** if the swap required any interface adjustments. If no adjustments, log the swap in the tracker only.
-
-### Deferred-Decisions Tracker
-
-Create `.dev-flow/architecture/deferred-decisions.md` for the project if it does not exist. Use this template:
-
-**Adapter Status values:** `fake` (not yet swapped) | `swapped` (real adapter is wired) | `not deferred` (real was used from the start)
-
-```markdown
-# Deferred Decisions
-
-## Adapter Swaps
-
-| Adapter | Status | Deferred To | Trigger Criteria | Swapped On |
-|---------|--------|-------------|------------------|------------|
-| EmailAdapter | swapped | SendGrid | "Need real email delivery in production" | 2026-03-28 |
-| UserRepository | fake | PostgreSQL | "When concurrent writes needed" | — |
-| PaymentGateway | fake | Stripe | "When payment processing required" | — |
-
-## Other Deferred Decisions
-
-| Decision | Deferred To | Trigger Criteria |
-|----------|-------------|------------------|
-| SQLite → Postgres | Postgres | "When concurrent writes needed" |
+Options:
+  [1] Resolve — swap fake→real adapter now
+  [2] Re-defer — keep open, update trigger criteria with new reason
+  [3] Skip — mark as closed with documented reason
 ```
 
-Run full test suite after each swap. All tests must pass before the swap is considered done.
+**Option 1 — Resolve:**
+Run the Swap Protocol from Step 6.4.5.
 
----
+**Option 2 — Re-defer:**
+- Ask the user to provide the new trigger criteria in plain text
+- Update the `Trigger Criteria` column in the tracker
+- Mark Status as `pending` (if it was `fake`)
+- Move to next item.
+
+**Option 3 — Skip:**
+- Require the user to type a brief reason (one sentence minimum)
+- Update the tracker's `Trigger Criteria` column with: "SKIPPED — {reason}"
+- Mark Status as `skipped`
+- Move to next item.
+
+### 6.4.4 Hard Gate Enforcement
+
+**This is a HARD-GATE on the Phase 7 checkpoint.** The standard checkpoint options (Continue / Pause / End) are NOT shown until ALL open deferred decisions have a final disposition (resolved, re-deferred, or skipped with reason).
+
+After the last item is handled:
+```
+All {N} deferred decisions handled.
+Proceeding to Phase 7 checkpoint.
+```
+
+### 6.4.5 Swap Protocol
+
+1. Mark the fake as `@deprecated use XyzAdapter`
+2. Create the real adapter implementing the same port interface
+3. Swap the DI binding (one line in composition root)
+4. Run full test suite — all must pass
+5. Update the deferred-decisions tracker: set **Status** to `swapped`, **Swapped On** to today's date
 
 ## 6.5 E2E Verification
 
@@ -663,6 +636,7 @@ Before Phase 7, verify ALL of the following:
 - [ ] Self-critique pass completed for every task (correctness, style, performance, security)
 - [ ] Domain glossary at `docs/domain-glossary.md` referenced during implementation (if domain code was touched)
 - [ ] All 7 test types are represented in the test suite (check `references/testing-pyramid.md` for the complete list)
+- [ ] All deferred decisions reviewed at Section 6.4 gate (hard gate passed)
 
 ---
 
@@ -677,13 +651,11 @@ content: implementation summary — tasks completed, total tests, key decisions 
 
 "Review `docs/workspace.dsl` and `docs/architecture/` — does the model reflect what was actually built? Update any sections that diverged from the Phase 3 design. Write an ADR for any implementation decision not yet recorded in `docs/decisions/`."
 
-## Checkpoint
+## Phase 6 Checkpoint
 
-Present to the user:
+Before presenting options:
 
-1. **Tasks completed**: N total, all verified
-2. **Test summary**: total tests, all passing
-3. **Deferred decision swaps**: which were done, which were kept
-4. **Any plan deviations**
-- UI tasks passed `/frontend-normalize` and `/frontend-polish`?
-5. Options: [Continue to Gap Analysis] [Pause] [End]
+1. Run Section 6.4 Deferred-Decision Gate — ALL open items must be resolved, re-deferred, or skipped before proceeding
+2. Present Phase 7 checkpoint options:
+
+Options: [Continue to Gap Analysis] [Pause] [End]
