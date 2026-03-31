@@ -11,6 +11,9 @@ ENV_PATH = PROJECT_ROOT / ".env"
 ENV_EXAMPLE_PATH = PROJECT_ROOT / ".env.example"
 TRACKER_PATH = PROJECT_ROOT / ".dev-flow" / "architecture" / "deferred-decisions.md"
 
+sys.path.insert(0, str(pathlib.Path(__file__).parent))
+from _json_output import gate_exit
+
 def find_latest_plan() -> pathlib.Path | None:
     """Find the most recently modified .md plan file, excluding premortem plans."""
     if not PLANS_DIR.exists():
@@ -48,17 +51,13 @@ def scan_env_references(plan_path: pathlib.Path | None) -> list[str]:
     in_code_block = False
     for line in content.splitlines():
         stripped = line.strip()
-        # Track code block boundaries
         if stripped.startswith('```'):
             in_code_block = not in_code_block
             continue
-        # Skip content inside code blocks
         if in_code_block:
             continue
-        # Skip markdown comment lines
         if stripped.startswith('#'):
             continue
-        # Skip markdown structural lines (headers, list items)
         if stripped.startswith('- ') or stripped.startswith('* ') or stripped.startswith('|'):
             continue
         if 'process.env' in line:
@@ -75,11 +74,30 @@ def scan_third_party_urls(plan_path: pathlib.Path | None) -> list[str]:
     external = [u for u in urls if not any(h in u for h in ['localhost', '127.0.0.1', '.local'])]
     return list(set(external))
 
-def check_env_vars() -> tuple[bool, list[str]]:
+def check_plan_exists() -> dict:
+    if PLAN_PATH is None:
+        return {
+            "check": "plan_exists",
+            "status": "fail",
+            "message": f"implementation plan: NOT FOUND in {PLANS_DIR}",
+            "fix": "Run Phase 5 planning to create an implementation plan",
+            "missing": [],
+        }
+    if PLAN_PATH.exists():
+        return {"check": "plan_exists", "status": "pass", "message": f"plan: OK ({PLAN_PATH.name})", "fix": "", "missing": []}
+    return {
+        "check": "plan_exists",
+        "status": "fail",
+        "message": f"implementation plan: NOT FOUND",
+        "fix": "Run Phase 5 planning to create an implementation plan",
+        "missing": [],
+    }
+
+def check_env_vars() -> dict:
     """Check that all process.env references in the plan have values set."""
     refs = scan_env_references(PLAN_PATH)
     if not refs:
-        return True, []
+        return {"check": "env_vars", "status": "pass", "message": "env vars: none referenced in plan", "fix": "", "missing": []}
     env = load_env(ENV_PATH)
     env_example = load_env(ENV_EXAMPLE_PATH)
     missing = []
@@ -87,13 +105,19 @@ def check_env_vars() -> tuple[bool, list[str]]:
         if var not in env and var not in env_example:
             missing.append(var)
     if missing:
-        return False, missing
-    return True, []
+        return {
+            "check": "env_vars",
+            "status": "fail",
+            "message": f"missing env vars ({len(missing)}): {', '.join(missing)}",
+            "fix": f"Add {missing[0]}{' and others' if len(missing) > 1 else ''} to .env or .env.example",
+            "missing": missing,
+        }
+    return {"check": "env_vars", "status": "pass", "message": f"env vars: all {len(refs)} referenced vars configured", "fix": "", "missing": []}
 
-def check_fake_adapters_pending() -> tuple[bool, list[str]]:
+def check_fake_adapters_pending() -> dict:
     """Check deferred decisions tracker for fake adapters that need swapping."""
     if not TRACKER_PATH.exists():
-        return True, []
+        return {"check": "fake_adapters_pending", "status": "pass", "message": "deferred decisions tracker: not found (skipping)", "fix": "", "missing": []}
     content = TRACKER_PATH.read_text()
     fake_items = []
     in_entry = False
@@ -108,57 +132,36 @@ def check_fake_adapters_pending() -> tuple[bool, list[str]]:
         if in_entry:
             current_entry.append(line)
     if fake_items:
-        return False, fake_items
-    return True, []
+        return {
+            "check": "fake_adapters_pending",
+            "status": "fail",
+            "message": f"fake adapters still wired ({len(fake_items)}): {', '.join(fake_items)}",
+            "fix": "Swap or resolve each fake adapter in .dev-flow/architecture/deferred-decisions.md before Phase 6",
+            "missing": fake_items,
+        }
+    return {"check": "fake_adapters_pending", "status": "pass", "message": "fake adapters: none pending", "fix": "", "missing": []}
 
-def check_third_party_urls() -> tuple[bool, list[str]]:
-    """Check if third-party URLs referenced in plan are configured."""
+def check_third_party_urls() -> dict:
+    """Report third-party URLs found in plan (informational)."""
     urls = scan_third_party_urls(PLAN_PATH)
     if not urls:
-        return True, []
-    return True, urls  # Pass but report
+        return {"check": "third_party_urls", "status": "pass", "message": "third-party URLs: none found in plan", "fix": "", "missing": []}
+    return {"check": "third_party_urls", "status": "pass", "message": f"third-party URLs: {len(urls)} found in plan (informational)", "fix": "", "missing": urls}
 
 def main() -> int:
     print("=== Gate Phase 6 Start: Pre-flight Check ===\n")
     print(f"Plan: {PLAN_PATH.name if PLAN_PATH else 'none found'}")
     print(f"Env:  {ENV_PATH}\n")
-
-    env_pass, missing_envs = check_env_vars()
-    fake_pass, fake_items = check_fake_adapters_pending()
-    url_pass, urls = check_third_party_urls()
-
-    failed = False
-
-    if not env_pass:
-        failed = True
-        print(f"❌ Missing env vars ({len(missing_envs)}):")
-        for var in missing_envs:
-            print(f"   {var}")
-        print()
-
-    if not fake_pass:
-        failed = True
-        print(f"❌ Fake adapters still wired ({len(fake_items)}):")
-        for item in fake_items:
-            print(f"   {item}")
-        print("   Run swap protocol before Phase 6 begins.")
-        print()
-
-    if url_pass and urls:
-        print(f"✅ Third-party services: {len(urls)} URL(s) found in plan")
-        for url in urls:
-            print(f"   {url}")
-        print()
-
-    if not failed:
-        print("✅ Pre-flight: PASS — no missing env vars or third-party dependencies\n")
-        print("Gate Phase 6 Start: PASS")
-        return 0
-
-    print()
-    print("Gate Phase 6 Start: FAIL")
-    print("Run `/dev-flow continue` once ready.")
-    return 1
+    checks = [
+        check_plan_exists(),
+        check_env_vars(),
+        check_fake_adapters_pending(),
+        check_third_party_urls(),
+    ]
+    for c in checks:
+        symbol = {"pass": "✅", "fail": "❌", "skip": "⏭️"}[c["status"]]
+        print(f"{symbol} {c['message']}")
+    return gate_exit("phase6_start", checks)
 
 if __name__ == "__main__":
     sys.exit(main())
