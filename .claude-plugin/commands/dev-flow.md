@@ -469,11 +469,6 @@ If a major debug is detected during Phase 6 (3+ consecutive implementer failures
 │   ├── brainstorm.md       # Brainstorming notes
 │   └── approach.md         # Selected approach + rationale
 ├── architecture/           # Phase 3 outputs
-│   ├── c4/                 # C4 diagrams (Structurizr DSL)
-│   │   ├── context.puml    # System Context
-│   │   ├── container.puml  # Container diagram
-│   │   ├── component.puml  # Component diagram (per component)
-│   │   └── deployment.puml # Deployment diagram
 │   ├── sequences/          # Mermaid sequence diagrams
 │   └── folder-structure.md # Project folder layout
 ├── plans/                  # Phase 4 & 5 outputs
