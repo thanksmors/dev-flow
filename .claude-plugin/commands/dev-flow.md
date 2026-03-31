@@ -109,14 +109,14 @@ Order: user-profile → tech-stack → libraries-and-mcps → testing → progra
 
 After all files: write (overwrite) updated preferences to `.dev-flow/preferences/` and confirm saved.
 
-### Step 0.4 — GitHub Authentication Required (HARD-GATE)
+### Step 0.4 — Prerequisites Gate (HARD-GATE)
 
-Check `gh auth status`.
-If not authenticated:
-  1. Tell the user: "GitHub authentication required. Run `gh auth login` first."
-  2. Present a prompt: [I've run gh auth login]
-  3. Do NOT proceed until `gh auth status` passes.
-  4. This is a HARD-GATE — non-negotiable.
+Run: `python3 ${CLAUDE_PLUGIN_ROOT}/gates/gate_phase0.py`
+
+- Exit 0 → all checks passed. Proceed to Step 0.4b.
+- Exit 1 → gate failed. Print the gate's output. User resolves, then re-run the gate or run `/dev-flow continue`.
+
+This is a **HARD-GATE** — no further workflow steps until gate_phase0.py exits 0.
 
 ### Step 0.4b — Remote Setup
 

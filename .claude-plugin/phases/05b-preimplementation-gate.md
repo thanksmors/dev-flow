@@ -5,20 +5,9 @@ description: HARD-GATE verification before entering Phase 6 implementation
 
 # Phase 5b: Pre-Implementation Gate
 
-<HARD-GATE>
-You CANNOT begin Phase 6 (Implementation) until ALL of the following are true:
+Run: `python3 ${CLAUDE_PLUGIN_ROOT}/gates/gate_phase5b.py`
 
-✅ Phase 5 planning is complete (`.dev-flow/plans/implementation.md` exists and contains tasks)
-✅ All previous phases are complete (phases 1–5 in completedPhases)
-✅ User has approved the plan at the Phase 5 checkpoint
-✅ Execution mode has been selected (Sequential Subagents)
-✅ YOLO mode has been confirmed (if applicable)
-</HARD-GATE>
+- Exit 0 → pre-implementation checks passed. Proceed to Phase 6.
+- Exit 1 → pre-implementation checks failed. Print the gate's output. User resolves missing items, then re-run the gate or run `/dev-flow continue`.
 
-If any gate item is false:
-→ State which gate item is unmet
-→ Do not proceed to Phase 6
-
-If all gate items are true:
-→ Log gate pass in state.json
-→ Proceed to Phase 6
+This is a **HARD-GATE** — Phase 6 cannot begin until gate_phase5b.py exits 0.
