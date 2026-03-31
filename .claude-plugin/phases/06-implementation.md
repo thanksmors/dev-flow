@@ -349,7 +349,7 @@ Write to `.dev-flow/debug.md` (NOT deleted — persists for next session):
 - {list of all files touched across all rounds}
 ```
 
-This report becomes the input for the Phase 6 Adjustment Gate (section 6.8).
+This report becomes the input for the Phase 6 Adjustment Gate (section 6.9).
 
 ### File Lifecycle
 
