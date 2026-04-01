@@ -45,20 +45,21 @@ Also read `PRINCIPLES.md` at `${CLAUDE_PLUGIN_ROOT}/PRINCIPLES.md` — the six n
 
 ### Step 0.0 — Discover Available Sets
 
-Before Step 0.1, scan for available preference sets.
+Before Step 0.1, read the YAML registry to discover available preference sets.
 
-1. Resolve plugin root: `${CLAUDE_PLUGIN_ROOT}` — if not set, look for `${CLAUDE_PLUGIN_ROOT}/plugin.json` marker
-2. Scan `${CLAUDE_PLUGIN_ROOT}/preferences/sets/` — each subfolder is a named set
-3. If `sets/` does not exist → fall back to `${CLAUDE_PLUGIN_ROOT}/preferences/defaults/` (the legacy path) and treat it as the only set named "default"
-4. Check if `.dev-flow/preferences/` exists in the project root and contains at least one `.md` file → note the currently active set (read `.dev-flow/active-set.txt` if it exists)
+1. Read `${CLAUDE_PLUGIN_ROOT}/preferences/sets/README.md`
+2. Parse the YAML frontmatter (between `---` markers) to extract `sets[]` — each entry has `name`, `description`, `path`
+3. If YAML parsing fails or `sets/` does not exist → fall back to scanning `${CLAUDE_PLUGIN_ROOT}/preferences/sets/` directories (backward compat)
+4. Check if `.dev-flow/preferences/` has an active set (read `.dev-flow/active-set.txt` if it exists)
 5. Write `.dev-flow/available-sets.json`:
 
 ```json
 {
   "sets": [
-    { "name": "default",   "source": "plugin", "path": ".../sets/default",   "hasOverride": false },
-    { "name": "minimal",   "source": "plugin", "path": ".../sets/minimal",   "hasOverride": false },
-    { "name": "full-stack", "source": "plugin", "path": ".../sets/full-stack","hasOverride": false }
+    { "name": "default",       "source": "plugin", "path": ".../sets/default",       "description": "Bun + Nuxt — single-app frontend, no backend yet",       "hasOverride": false },
+    { "name": "nuxt-insforge", "source": "plugin", "path": ".../sets/nuxt-insforge", "description": "Bun + Nuxt + Insforge + Nuxt UI — full vertical slices + ports-and-adapters", "hasOverride": false },
+    { "name": "full-stack",    "source": "plugin", "path": ".../sets/full-stack",    "description": "Bun + Nuxt + Fastify — for CPU-intensive backend work",  "hasOverride": false },
+    { "name": "tauri-ide",     "source": "plugin", "path": ".../sets/tauri-ide",     "description": "Tauri 2.0 + React + Rust + CodeMirror 6 — desktop IDE with plugin system",  "hasOverride": false }
   ],
   "activeSet": null
 }
@@ -68,12 +69,7 @@ Set `activeSet` to the value from `active-set.txt` if it exists.
 
 ### Step 0.1 — AskUserQuestion: Select Set
 
-Build the options list from `available-sets.json`. For each set, extract a one-line description:
-- Read the first non-empty line of `tech-stack.md` under the `## Package Manager` section (e.g., "bun")
-- Read the first non-empty line of `## Backend` (e.g., "insforge" or "none")
-- Read the `type:` value from `user-profile.md`
-- Read the YOLO `default:` value from `user-profile.md`
-- Format: `"{name} — {bun} + {backend}, {profile} profile, YOLO {yolo-default}"`
+Build the options list from `available-sets.json`. For each set, the description comes from the `description` field in `available-sets.json` (extracted from the YAML registry). No need to read any set files.
 
 If a set is the current active set (from `active-set.txt`), append " (current)".
 
