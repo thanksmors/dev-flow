@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 """Gate Phase 5b: Pre-implementation gate — verify plan is ready before Phase 6."""
 
 import sys
@@ -156,7 +156,7 @@ def main() -> int:
         check_deferred_decisions_clean(),
     ]
     for c in checks:
-        symbol = {"pass": "✅", "fail": "❌", "skip": "⏭️"}[c["status"]]
+        symbol = {"pass": "[PASS]", "fail": "[FAIL]", "skip": "[SKIP]"}[c["status"]]
         print(f"{symbol} {c['message']}")
     return gate_exit("phase5b", checks)
 
