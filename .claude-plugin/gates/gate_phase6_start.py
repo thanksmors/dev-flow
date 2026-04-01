@@ -6,7 +6,7 @@ import pathlib
 import re
 
 PROJECT_ROOT = pathlib.Path.cwd()
-PLANS_DIR = PROJECT_ROOT / "docs" / "superpowers" / "plans"
+PLANS_DIR = PROJECT_ROOT / ".dev-flow" / "plans"
 ENV_PATH = PROJECT_ROOT / ".env"
 ENV_EXAMPLE_PATH = PROJECT_ROOT / ".env.example"
 TRACKER_PATH = PROJECT_ROOT / ".dev-flow" / "architecture" / "deferred-decisions.md"
