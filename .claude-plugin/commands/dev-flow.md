@@ -43,19 +43,68 @@ Run this before checking state.json on every `/dev-flow` start (including `conti
 
 Also read `PRINCIPLES.md` at `${CLAUDE_PLUGIN_ROOT}/PRINCIPLES.md` — the six non-negotiables are active for the entire session.
 
-### Step 0.1 — Detect preference source
+### Step 0.0 — Discover Available Sets
 
-Check for project preferences:
-- If `.dev-flow/preferences/` exists in the project root AND contains at least one `.md` file → **project preferences found**
-- Otherwise → **no project preferences, use plugin defaults**
+Before Step 0.1, scan for available preference sets.
 
-### Step 0.1a — Resolve plugin root
-The plugin root is `${CLAUDE_PLUGIN_ROOT}`. If this env var is not set, resolve it by:
-1. Looking for a known marker file: `${CLAUDE_PLUGIN_ROOT}/plugin.json`
-2. If not found, use the path where dev-flow.md is located as the plugin root
-If plugin root cannot be resolved, set it to the path where dev-flow.md is located.
+1. Resolve plugin root: `${CLAUDE_PLUGIN_ROOT}` — if not set, look for `${CLAUDE_PLUGIN_ROOT}/plugin.json` marker
+2. Scan `${CLAUDE_PLUGIN_ROOT}/preferences/sets/` — each subfolder is a named set
+3. If `sets/` does not exist → fall back to `${CLAUDE_PLUGIN_ROOT}/preferences/defaults/` (the legacy path) and treat it as the only set named "default"
+4. Check if `.dev-flow/preferences/` exists in the project root and contains at least one `.md` file → note the currently active set (read `.dev-flow/active-set.txt` if it exists)
+5. Write `.dev-flow/available-sets.json`:
 
-### Step 0.2 — Load preferences
+```json
+{
+  "sets": [
+    { "name": "default",   "source": "plugin", "path": ".../sets/default",   "hasOverride": false },
+    { "name": "minimal",   "source": "plugin", "path": ".../sets/minimal",   "hasOverride": false },
+    { "name": "full-stack", "source": "plugin", "path": ".../sets/full-stack","hasOverride": false }
+  ],
+  "activeSet": null
+}
+```
+
+Set `activeSet` to the value from `active-set.txt` if it exists.
+
+### Step 0.1 — AskUserQuestion: Select Set
+
+Build the options list from `available-sets.json`. For each set, extract a one-line description:
+- Read the first non-empty line of `tech-stack.md` under the `## Package Manager` section (e.g., "bun")
+- Read the first non-empty line of `## Backend` (e.g., "insforge" or "none")
+- Read the `type:` value from `user-profile.md`
+- Read the YOLO `default:` value from `user-profile.md`
+- Format: `"{name} — {bun} + {backend}, {profile} profile, YOLO {yolo-default}"`
+
+If a set is the current active set (from `active-set.txt`), append " (current)".
+
+**AskUserQuestion options:**
+- [ ] **Reset to plugin defaults** (no saved preferences)
+- [ ] **{name}** — description (current)
+- [ ] **{name}** — description
+- [ ] **{name}** — description
+
+Ask:
+> "Choose a preference set:"
+{multiselect: false, options: [...the list above...]}
+
+### Step 0.2 — Load Selected Set
+
+**If user picks "Reset to plugin defaults (no saved preferences)":**
+→ Remove `.dev-flow/preferences/` directory and `.dev-flow/active-set.txt`
+→ Load files from `${CLAUDE_PLUGIN_ROOT}/preferences/defaults/` in memory
+→ Note: if the user proceeds to Customize in Step 0.4, their customized choices will be saved to `.dev-flow/preferences/`.
+
+**If user picks a named set:**
+1. Resolve the set path: `${CLAUDE_PLUGIN_ROOT}/preferences/sets/{name}/`
+2. Copy the 6 `.md` files from the set folder into `.dev-flow/preferences/`, overwriting existing files
+3. Write the set name to `.dev-flow/active-set.txt`
+4. Update `available-sets.json`: set `activeSet` to the chosen name, set `hasOverride: true` for that set
+5. Load the files in memory and proceed to Step 0.3
+
+After copying, count the files in `.dev-flow/preferences/`. If not exactly 6, print a warning:
+> "Preference set copy warning: expected 6 files but found {N}. Check that the set at `{path}` is complete."
+
+### Step 0.3 — Show Preference Summary
 
 **If project preferences found:**
 1. Read all files in `.dev-flow/preferences/`
@@ -65,10 +114,9 @@ If plugin root cannot be resolved, set it to the path where dev-flow.md is locat
    - YOLO default: read the value after `default:` in `## YOLO Mode` from user-profile.md
    - Output: > "Using saved preferences — stack: {runtime} + {backend} + {frontend}, profile: {type}, YOLO: {yolo-default}"
 3. Ask (AskUserQuestion):
-   > "Use saved preferences / Customize / Reset to plugin defaults"
-   - **Use saved** → proceed to state management with loaded preferences
-   - **Customize** → go to Step 0.3
-   - **Reset to defaults** → load plugin defaults, go to Step 0.3 (Step 0.3 will overwrite any existing files in `.dev-flow/preferences/`)
+   > "Customize / Reset to plugin defaults"
+   - **Customize** → go to Step 0.4
+   - **Reset to defaults** → load plugin defaults, go to Step 0.4 (Step 0.4 will overwrite any existing files in `.dev-flow/preferences/`)
 
 **If no project preferences found:**
 1. Load all files from `${CLAUDE_PLUGIN_ROOT}/preferences/defaults/`
@@ -91,10 +139,10 @@ Print:
 3. Ask (AskUserQuestion):
    > "Save defaults and continue / Customize before saving / Skip preferences (use defaults this session only)"
    - **Save defaults** → copy defaults to `.dev-flow/preferences/`, proceed
-   - **Customize** → go to Step 0.3
+   - **Customize** → go to Step 0.4
    - **Skip** → use defaults in memory only, do not write to disk
 
-### Step 0.3 — Customize preferences (only if requested)
+### Step 0.4 — Customize preferences (only if requested)
 
 Walk through each preference file one at a time. For each file:
 1. Show the current value in plain language (not raw markdown)
@@ -109,11 +157,11 @@ Order: user-profile → tech-stack → libraries-and-mcps → testing → progra
 
 After all files: write (overwrite) updated preferences to `.dev-flow/preferences/` and confirm saved.
 
-### Step 0.4 — Prerequisites Gate (HARD-GATE)
+### Step 0.5 — Prerequisites Gate (HARD-GATE)
 
 Run: `python3 ${CLAUDE_PLUGIN_ROOT}/gates/gate_phase0.py`
 
-- Exit 0 → all checks passed. Proceed to Step 0.4b.
+- Exit 0 → all checks passed. Proceed to Step 0.6.
 - Exit 1 → gate failed.
 
 **Fix Loop — Round 1:**
@@ -123,7 +171,7 @@ Run: `python3 ${CLAUDE_PLUGIN_ROOT}/gates/gate_phase0.py`
    - Each fixer receives: `fix_item` (check, fix, missing), `gate_name: "phase0"`, `round: 1`, `what_was_tried: []`
 4. Wait for all fixers to complete
 5. Re-run gate_phase0.py
-6. If exit 0 → print "✅ Gate fixed." Proceed to Step 0.4b.
+6. If exit 0 → print "✅ Gate fixed." Proceed to Step 0.6.
 7. If exit 1 → Round 2
 
 **Fix Loop — Round 2 (if Round 1 didn't resolve):**
@@ -131,14 +179,14 @@ Run: `python3 ${CLAUDE_PLUGIN_ROOT}/gates/gate_phase0.py`
 2. Dispatch up to 2 fixer agents in parallel, each with full context of what Round 1 tried for this item
    - Each fixer receives: `fix_item`, `gate_name: "phase0"`, `round: 2`, `what_was_tried: [round1 attempt summary]`
 3. Re-run gate_phase0.py
-4. If exit 0 → print "✅ Gate fixed after escalation." Proceed to Step 0.4b.
+4. If exit 0 → print "✅ Gate fixed after escalation." Proceed to Step 0.6.
 5. If exit 1 → present remaining issues to user. Options: [Pause] [End]
 
 Tell the user: "Gate failed — running autonomous fix loop (Round 1). Will retry automatically."
 
 This is a **HARD-GATE** — no further workflow steps until gate_phase0.py exits 0.
 
-### Step 0.4b — Remote Setup
+### Step 0.6 — Remote Setup
 
 After gh auth passes, check `git remote -v`.
 
@@ -157,7 +205,7 @@ After gh auth passes, check `git remote -v`.
      - **Create a new GitHub repo** → run steps 3-6 above with user-provided name
      - **Use existing remote** → proceed with current remote, no changes
 
-### Step 0.5 — Load Deferred Decisions
+### Step 0.7 — Load Deferred Decisions
 After loading preferences, check for `.dev-flow/architecture/deferred-decisions.md`.
 If it exists:
 1. Read the file
@@ -181,7 +229,7 @@ If a gap is encountered during any phase:
   - Append a new entry to `.dev-flow/lessons.md` (never edit existing entries)
   - Use the format from phases/01-discovery.md step 1.3
 
-### Step 0.6 — YOLO prompt (on `continue` reaching Phase 6, or at Phase 6 start)
+### Step 0.8 — YOLO prompt (on `continue` reaching Phase 6, or at Phase 6 start)
 
 When Phase 6 is about to begin (either fresh or resumed):
 - Read `user-profile.yolo-default`
