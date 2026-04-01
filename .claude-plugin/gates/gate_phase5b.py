@@ -14,6 +14,54 @@ LAYERS_DIR = PROJECT_ROOT / "layers"
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
 from _json_output import gate_exit
 
+LESSONS_PATH = PROJECT_ROOT / ".dev-flow" / "lessons.md"
+
+def check_lessons_format() -> dict:
+    """Soft warn if lessons.md missing; hard fail if exists but malformed."""
+    if not LESSONS_PATH.exists():
+        return {
+            "check": "lessons_format",
+            "status": "warn",
+            "message": "lessons: .dev-flow/lessons.md not found (soft warn — may be created during workflow)",
+            "fix": "File will be created when first gap is encountered. No action needed now.",
+            "missing": [],
+        }
+    content = LESSONS_PATH.read_text()
+    if not content.strip():
+        return {
+            "check": "lessons_format",
+            "status": "fail",
+            "message": "lessons: .dev-flow/lessons.md is empty",
+            "fix": "Create .dev-flow/lessons.md with a header: '# Lessons Log\n\nAppend only. Never edit existing entries.\n\n---\n'",
+            "missing": [],
+        }
+    # Check each entry has required fields
+    entries = content.split('## ')
+    malformed = []
+    for entry in entries[1:]:  # skip header
+        lines = entry.split('\n')
+        header = lines[0].strip() if lines else ""
+        body = '\n'.join(lines[1:]) if len(lines) > 1 else ""
+        has_error = "**Error:**" in body
+        has_fix = "**Fix:**" in body
+        if header and not (has_error and has_fix):
+            malformed.append(header[:60])
+    if malformed:
+        return {
+            "check": "lessons_format",
+            "status": "fail",
+            "message": f"lessons: {len(malformed)} malformed entry/entries (missing **Error:** or **Fix:**)",
+            "fix": "Fix entries in .dev-flow/lessons.md — each entry needs **Error:** and **Fix:** fields",
+            "missing": malformed,
+        }
+    return {
+        "check": "lessons_format",
+        "status": "pass",
+        "message": "lessons: format OK",
+        "fix": "",
+        "missing": [],
+    }
+
 def find_latest_plan() -> pathlib.Path | None:
     """Find the most recently modified .md plan file, excluding premortem plans."""
     if not PLANS_DIR.exists():
@@ -154,9 +202,10 @@ def main() -> int:
         check_ports_defined(),
         check_fake_adapters(),
         check_deferred_decisions_clean(),
+        check_lessons_format(),
     ]
     for c in checks:
-        symbol = {"pass": "[PASS]", "fail": "[FAIL]", "skip": "[SKIP]"}[c["status"]]
+        symbol = {"pass": "[PASS]", "fail": "[FAIL]", "skip": "[SKIP]", "warn": "[WARN]"}[c["status"]]
         print(f"{symbol} {c['message']}")
     return gate_exit("phase5b", checks)
 
