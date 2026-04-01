@@ -20,7 +20,7 @@ Before drafting C4 diagrams, check whether this is a multi-page project:
 - **Rule:** When in doubt, assume multi-page and scaffold anyway.
 
 If multi-page is detected (or ambiguous), add a `Navigation & Scaffolding` sub-step
-after step 3.6 and before step 3.7.
+after step 3.6 and before step 3.8.
 
 ### 3.1 Design the Walking Skeleton
 
@@ -100,8 +100,8 @@ docs/
 
 1. **Model block** — define people, softwareSystems, containers, and components
 2. **Views block** — systemContext, container, and component views with `autoLayout` and styles
-3. **`!docs architecture/`** — connects the prose doc sections (written in step 3.8)
-4. **`!adrs decisions/`** — connects the ADR files (first one written in step 3.7)
+3. **`!docs architecture/`** — connects the prose doc sections (written in step 3.10)
+4. **`!adrs decisions/`** — connects the ADR files (first one written in step 3.9)
 
 **Component loop (enumerate-first):**
 
