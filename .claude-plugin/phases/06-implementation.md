@@ -59,7 +59,7 @@ Before Phase 6 begins, confirm Phase 0 prerequisites passed. If not yet run:
 
 **Before any task runs, run the gate script.**
 
-Run: `python3 ${CLAUDE_PLUGIN_ROOT}/gates/gate_phase6_start.py`
+Run: `PYTHONIOENCODING=utf-8 python ${CLAUDE_PLUGIN_ROOT}/gates/gate_phase6_start.py`
 
 - Exit 0 → pre-flight passed. Show "✅ Pre-flight passed" and proceed to Step 6.1.
 - Exit 1 → gate failed.
@@ -70,7 +70,7 @@ Run: `python3 ${CLAUDE_PLUGIN_ROOT}/gates/gate_phase6_start.py`
 3. Dispatch one fixer agent per failing item in parallel (max 3 agents) using `${CLAUDE_PLUGIN_ROOT}/agents/fixer-agent.md`
    - Each fixer receives: `fix_item` (check, fix, missing), `gate_name: "phase6_start"`, `round: 1`, `what_was_tried: []`
 4. Wait for all fixers to complete
-5. Re-run gate_phase6_start.py
+5. Re-run: `PYTHONIOENCODING=utf-8 python ${CLAUDE_PLUGIN_ROOT}/gates/gate_phase6_start.py`
 6. If exit 0 → print "✅ Gate fixed." Proceed to Step 6.1.
 7. If exit 1 → Round 2
 
@@ -78,7 +78,7 @@ Run: `python3 ${CLAUDE_PLUGIN_ROOT}/gates/gate_phase6_start.py`
 1. Re-parse JSON from gate output — remaining items are the ones still failing
 2. Dispatch up to 2 fixer agents in parallel, each with full context of what Round 1 tried for this item
    - Each fixer receives: `fix_item`, `gate_name: "phase6_start"`, `round: 2`, `what_was_tried: [round1 attempt summary]`
-3. Re-run gate_phase6_start.py
+3. Re-run: `PYTHONIOENCODING=utf-8 python ${CLAUDE_PLUGIN_ROOT}/gates/gate_phase6_start.py`
 4. If exit 0 → print "✅ Gate fixed after escalation." Proceed to Step 6.1.
 5. If exit 1 → present remaining issues to user. Options: [Pause] [End]
 
@@ -98,7 +98,7 @@ Record in `state.json` → `executionMode`: `"sequential"`.
 
 ## 6.2 Sequential Subagents
 
-Read the implementation plan from `docs/superpowers/plans/` (plans are saved here during the workflow).
+Read the implementation plan from `.dev-flow/plans/` (plans are saved here during the workflow).
 Extract ALL tasks with their full text upfront (do not re-read the plan per task).
 
 For each task, run the autonomous per-task loop:
@@ -125,6 +125,22 @@ Before dispatching the implementer for any task that touches domain code:
 1. Read `docs/domain-glossary.md` (if it exists)
 2. Pass the relevant domain terms to the implementer as part of the scene-setting context
 3. After implementation, flag any introduced synonyms for existing concepts
+
+**Relevant Past Lessons (DC-4):**
+Before dispatching the implementer:
+1. Read `.dev-flow/lessons.md` (project lessons)
+2. Read `dev-flow-plugin/lessons/` directory (plugin lessons — scan for relevant files)
+3. Filter lessons by:
+   - Current phase = `implementation`
+   - Current framework (e.g., `nuxt`)
+   - Current stack (e.g., `nuxt-ui`, `insforge`)
+   - Severity = `critical` (always included)
+4. Inject top 3-5 relevant lessons into implementer agent dispatch prompt:
+   ```
+   ## Relevant Past Lessons
+   {lesson title}: {one-line summary of the lesson and the actionable rule}
+   {lesson title}: {one-line summary}
+   ```
 
 **1. Dispatch Implementer**
 
@@ -183,7 +199,7 @@ Loop until quality reviewer says APPROVED (zero Critical issues).
 
 After completing all tasks within a vertical slice (detected when the next task belongs to a different slice, or when the slice's final task is marked done):
 
-1. **Read the slice's design intent** — from `docs/superpowers/specs/` (the design spec for this project) and the slice's section in the implementation plan
+1. **Read the slice's design intent** — from `.dev-flow/design/` (the design spec for this project) and the slice's section in the implementation plan
 2. **Review the slice's committed files** — all files changed across all tasks in this slice
 3. **Verify design requirements** — check each requirement from the spec against what was built in this slice
 4. **Check diagrams for this slice** — verify state diagrams (`.dev-flow/architecture/states/`) and sequence diagrams (`.dev-flow/architecture/sequences/`) exist for components built in this slice
@@ -372,7 +388,7 @@ This report becomes the input for the Phase 6 Adjustment Gate (section 6.9).
 
 After Phases 1-5 complete and before any Phase 6 task begins (including on resume from revert):
 
-1. Read `.dev-flow/lessons.md`
+1. Read `.dev-flow/lessons.md` and scan `dev-flow-plugin/lessons/` for plugin lessons
 2. If entries exist:
    - Present to user (AskUserQuestion): "Lesson from last attempt: **{title}** — **{one-line summary}**. Adjust manually or let me auto-update the plan?"
      - **Manual** → pause, let user review lessons and modify tasks/plan before Phase 6 proceeds
@@ -384,6 +400,7 @@ This gate is not a HARD-GATE — it's a choice presented to the user at the mome
 **8. Mark Task Complete**
 
 Log in state.json: "Task N: DONE — tests verified, spec compliant, approved"
+Update the task's `Status` to `complete` and `Wired` to `yes` in the implementation plan table (HI-3).
 Proceed to next task.
 
 ---
@@ -424,12 +441,17 @@ After each task that introduces architectural changes, update `docs/workspace.ds
 
 **After all Phase 6 tasks complete, before the Phase 7 checkpoint.**
 
-Run: `python3 ${CLAUDE_PLUGIN_ROOT}/gates/gate_phase6_end.py`
+Run **both** evidence gates:
 
-- Exit 0 → all deferred decisions resolved. Proceed directly to the Phase 7 checkpoint.
-- Exit 1 → gate failed. Print the gate's full output. For each open item, present the user with: Resolve / Re-defer / Skip. After all items are handled, re-run the gate. Only proceed when the gate exits 0. Tell the user: "Gate failed — handle each open item above, then run `/dev-flow continue` to re-run."
+1. `PYTHONIOENCODING=utf-8 python ${CLAUDE_PLUGIN_ROOT}/gates/gate_phase6_evidence.py`
+   - Exit 0 → mechanical evidence verified. Proceed to step 2.
+   - Exit 1 → evidence check failed. Fix items, re-run until exit 0.
 
-This is a **HARD-GATE on the Phase 7 checkpoint.** The standard checkpoint options are NOT shown until the gate exits 0.
+2. `PYTHONIOENCODING=utf-8 python ${CLAUDE_PLUGIN_ROOT}/gates/gate_phase6_end.py`
+   - Exit 0 → all deferred decisions resolved. Proceed to the Phase 7 checkpoint.
+   - Exit 1 → gate failed. Print the gate's full output. For each open item, present the user with: Resolve / Re-defer / Skip. After all items are handled, re-run the gate. Only proceed when the gate exits 0. Tell the user: "Gate failed — handle each open item above, then run `/dev-flow continue` to re-run."
+
+**Both gates must exit 0 before Phase 7.** This is a **HARD-GATE on the Phase 7 checkpoint.** The standard checkpoint options are NOT shown until both gates exit 0.
 
 ## 6.5 E2E Verification
 
@@ -528,9 +550,9 @@ Unit and integration tests are written first (TDD). `expect` generates browser t
 
 **When:** After ALL implementation tasks are complete (after the per-task loop exits), before the Quality Gate and Checkpoint.
 
-**What:** Read the design spec at `docs/superpowers/specs/` that corresponds to the plan being executed. Compare the full implementation against the spec:
+**What:** Read the design spec at `.dev-flow/design/` that corresponds to the plan being executed. Compare the full implementation against the spec:
 
-1. **Find the matching design spec** — for each plan in `docs/superpowers/plans/`, there is a corresponding spec in `docs/superpowers/specs/` with the same date/topic
+1. **Find the matching design spec** — read `.dev-flow/design/approach.md` and any design docs in `.dev-flow/design/`
 2. **Read the design spec** — understand the goals, principles, and specific requirements
 3. **Read the implementation** — review all files changed across all tasks
 4. **Check each design requirement** — verify it was implemented as specified
@@ -552,13 +574,17 @@ Unit and integration tests are written first (TDD). `expect` generates browser t
 
 Before Phase 7, verify ALL of the following:
 
+- [ ] **CR-3 gate_phase6_evidence.py passed** — run `PYTHONIOENCODING=utf-8 python ${CLAUDE_PLUGIN_ROOT}/gates/gate_phase6_evidence.py` and exit 0
+- [ ] **CR-3 gate_phase6_end.py passed** — run `PYTHONIOENCODING=utf-8 python ${CLAUDE_PLUGIN_ROOT}/gates/gate_phase6_end.py` and exit 0
 - [ ] ALL tasks have verification evidence (test output logged per task in state.json)
-- [ ] ALL spec reviews: COMPLIANT (per task)
-- [ ] ALL quality reviews: APPROVED (zero Critical issues per task)
+- [ ] ALL spec reviews: COMPLIANT (per task) — HI-1: neither spec nor quality review was skipped or bypassed
+- [ ] ALL quality reviews: APPROVED (zero Critical issues per task) — HI-1: looped until APPROVED
+- [ ] **HI-3 Wired column tracked** — every task with `Status: complete` has `Wired: yes`
 - [ ] Full test suite passes (fresh run — show full output)
 - [ ] No skipped tests or warnings
 - [ ] All pre-mortem mitigations implemented and tested
 - [ ] ADRs written for all implementation decisions (`docs/decisions/`)
+- [ ] **AR-5 ADR format validated** — all ADRs in `docs/decisions/` pass gate_phase5b.py format check
 - [ ] `docs/workspace.dsl` reflects what was actually built (new components added, relationships updated)
 - [ ] workspace.dsl was iteratively enriched — each container enriched and committed before moving to the next
 - [ ] Both workspace.dsl and workspace.json committed together

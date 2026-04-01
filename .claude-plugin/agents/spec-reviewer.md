@@ -19,7 +19,7 @@ You are NOT reviewing code quality, style, or performance. That is a separate re
 
 1. Read the original task spec carefully
 2. Read the implementation (files changed, tests written)
-3. Read the design spec at `docs/superpowers/specs/` (matching the plan being executed)
+3. Read the design spec at `.dev-flow/design/` (matching the plan being executed)
 4. For each requirement in the spec, verify it is implemented
 5. Check for anything implemented that was NOT in the spec (over-building)
 6. Check for anything in the spec that is NOT implemented (under-building)

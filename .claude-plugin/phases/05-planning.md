@@ -44,7 +44,22 @@ Within each vertical slice, order tasks:
 5. **Error handling** (with tests)
 6. **Integration tests** (end-to-end for the slice)
 
-### 5.4 Mark Deferred Decisions
+### 5.4 Convert Pre-Mortem Risks to Tasks (AR-4)
+
+After the Phase 4 pre-mortem, convert each identified risk into a tracked implementation task:
+
+1. Read `.dev-flow/plans/premortem.md`
+2. For each risk, determine if it warrants an implementation task:
+   - **Has mitigation that can be tested?** → create a task with the mitigation as the implementation
+   - **Risk is acceptable without action?** → add "accepted" note to the risk
+   - **No clear mitigation?** → flag for discussion before proceeding
+3. For each task created from a risk, tag it with `risk-mitigation` type
+4. Verify every pre-mortem risk has either a mapped task or an accepted note
+
+**Every pre-mortem risk MUST have a corresponding implementation task or an explicit "accepted" note.**
+If a risk has neither, the Phase 5 gate fails.
+
+### 5.5 Mark Deferred Decisions
 
 For each task that involves a deferred architectural decision:
 - Tag it with `[DEFERRED: {decision name}]`
@@ -67,7 +82,36 @@ Write the implementation plan to `.dev-flow/plans/implementation.md`:
 
 ## Tasks
 
+### Slice 0: Walking Skeleton (AR-3)
+
+**Task 0.1: DI Composition Root**
+- **File**: `app/diComposition.ts`
+- **Type**: implementation
+- **TDD cycle**: RED → GREEN → REFACTOR
+- **Test**: {what to test — e.g., "adapter resolves from container"}
+- **Implementation**: Create DI container, wire at least one fake adapter
+- **Verify**: `{command}` → `{expected output}`
+
+**Task 0.2: End-to-End Flow**
+- **File**: `server/api/{endpoint}.ts`, `layers/{domain}/domain/{entity}.ts`
+- **Type**: implementation
+- **TDD cycle**: RED → GREEN → REFACTOR
+- **Test**: {e2e test — one flow, read or create}
+- **Implementation**: One server route + one domain function + one test
+- **Verify**: `{command}` → `{expected output}`
+
+**Acceptance criteria for Slice 0:**
+- [ ] App starts without errors
+- [ ] `bun test` runs without errors
+- [ ] One E2E flow works (read or create)
+- [ ] At least one fake adapter wired
+
 ### Slice 1: {name}
+
+| # | Task | Status | Wired | Type | Tags |
+|---|------|--------|-------|------|------|
+| 1.1 | {description} | pending | | test | |
+| 1.2 | {description} | pending | | implementation | |
 
 #### Task 1.1: {description}
 - **File**: `{path}` — use canonical paths from `layer-scaffold.md` (e.g. `layers/{domain}/ports/`, `layers/{domain}/adapters/FakeXyzAdapter.ts`)
@@ -83,6 +127,20 @@ Write the implementation plan to `.dev-flow/plans/implementation.md`:
 
 ### Slice 2: {name}
 ...
+
+## Pre-Mortem Risk Mitigations (AR-4)
+
+For each risk from `.dev-flow/plans/premortem.md`:
+
+### [RISK] {risk name}
+- **Source:** Pre-mortem Risk #{N}
+- **Risk:** {one-line description}
+- **Mitigation:** {what we'll do}
+- **Acceptance criteria:** {test that proves mitigation works}
+- **Mapped to task(s):** Task {X.Y}, Task {X.Z}
+
+Every pre-mortem risk MUST have a corresponding implementation task or an explicit "accepted" note.
+Risks without tasks = Phase 5 gate fail.
 ```
 
 ### 5.6 Plan Review
@@ -107,13 +165,33 @@ Review the plan for:
 Before checkpoint, verify:
 
 - [ ] Every vertical slice has a complete set of tasks
+- [ ] Slice 0 (Walking Skeleton) is the first slice with acceptance criteria (AR-3)
 - [ ] Every task follows the TDD cycle (test → implement → verify)
 - [ ] Every task specifies exact file paths and commands
-- [ ] All risk mitigations from Phase 4 are mapped to tasks
+- [ ] Plan task table includes `Status` and `Wired` columns (AR-3/HI-3)
+- [ ] All risk mitigations from Phase 4 are mapped to tasks (AR-4)
+- [ ] Every pre-mortem risk has either a corresponding task or an accepted note (AR-4)
 - [ ] All deferred decisions are tagged and have adapter interfaces
-- [ ] Tasks are ordered correctly (dependencies respected)
+- [ ] Tasks are ordered correctly (dependencies respected, walking skeleton first)
 - [ ] The plan is self-contained (implementer needs no extra context)
 - [ ] State and decision journal are updated
+
+### Documentation Review (ST-3 — Soft Gate)
+
+This is a **soft gate** — the orchestrator asks, the user can proceed, but the prompt makes review obvious.
+
+After Phase 5 completes, present the review prompt:
+
+```
+Implementation plan ready. Review before Phase 6:
+- Plan: .dev-flow/plans/implementation.md
+- Pre-mortem risks: .dev-flow/plans/premortem.md
+- Architecture: .dev-flow/architecture/
+
+Have you reviewed the plan? [Yes, proceed] [Not yet]
+```
+
+This is implemented as an explicit checklist item in the Phase 5 quality gate above.
 
 ### Engram Save
 

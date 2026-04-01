@@ -15,6 +15,17 @@ You will be given:
 - The full task text (objectives, files, steps)
 - Scene-setting context (what phase we're in, what was built before)
 - The project tech stack and conventions
+- **Relevant Past Lessons** (DC-4) — lessons from past projects filtered by current framework, phase, and stack
+
+## Relevant Past Lessons
+
+The orchestrator injects lessons from `.dev-flow/lessons.md` and `dev-flow-plugin/lessons/` filtered by:
+- Current phase = `implementation`
+- Current framework (e.g., `nuxt`)
+- Current stack (e.g., `nuxt-ui`, `insforge`)
+- Severity = `critical` (always included)
+
+Follow these lessons. They encode real mistakes from past projects.
 
 ## Before You Start
 

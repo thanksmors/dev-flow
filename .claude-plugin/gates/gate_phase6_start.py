@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 """Gate Phase 6 Start: Pre-flight check — scan for missing env vars and third-party deps."""
 
 import sys
@@ -6,7 +6,7 @@ import pathlib
 import re
 
 PROJECT_ROOT = pathlib.Path.cwd()
-PLANS_DIR = PROJECT_ROOT / "docs" / "superpowers" / "plans"
+PLANS_DIR = PROJECT_ROOT / ".dev-flow" / "plans"
 ENV_PATH = PROJECT_ROOT / ".env"
 ENV_EXAMPLE_PATH = PROJECT_ROOT / ".env.example"
 TRACKER_PATH = PROJECT_ROOT / ".dev-flow" / "architecture" / "deferred-decisions.md"
@@ -159,7 +159,7 @@ def main() -> int:
         check_third_party_urls(),
     ]
     for c in checks:
-        symbol = {"pass": "✅", "fail": "❌", "skip": "⏭️"}[c["status"]]
+        symbol = {"pass": "[PASS]", "fail": "[FAIL]", "skip": "[SKIP]"}[c["status"]]
         print(f"{symbol} {c['message']}")
     return gate_exit("phase6_start", checks)
 

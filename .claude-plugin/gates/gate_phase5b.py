@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 """Gate Phase 5b: Pre-implementation gate — verify plan is ready before Phase 6."""
 
 import sys
@@ -6,13 +6,65 @@ import pathlib
 import re
 
 PROJECT_ROOT = pathlib.Path.cwd()
-PLANS_DIR = PROJECT_ROOT / "docs" / "superpowers" / "plans"
+PLANS_DIR = PROJECT_ROOT / ".dev-flow" / "plans"
 STATE_PATH = PROJECT_ROOT / ".dev-flow" / "state.json"
 TRACKER_PATH = PROJECT_ROOT / ".dev-flow" / "architecture" / "deferred-decisions.md"
 LAYERS_DIR = PROJECT_ROOT / "layers"
+DOCS_DIR = PROJECT_ROOT / "docs"
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
 from _json_output import gate_exit
+
+LESSONS_PATH = PROJECT_ROOT / ".dev-flow" / "lessons.md"
+DECISIONS_DIR = DOCS_DIR / "decisions"
+
+VALID_ADR_STATUSES = {"Proposed", "Accepted", "Superseded", "Deprecated", "Rejected"}
+
+def check_lessons_format() -> dict:
+    """Soft warn if lessons.md missing; hard fail if exists but malformed."""
+    if not LESSONS_PATH.exists():
+        return {
+            "check": "lessons_format",
+            "status": "warn",
+            "message": "lessons: .dev-flow/lessons.md not found (soft warn — may be created during workflow)",
+            "fix": "File will be created when first gap is encountered. No action needed now.",
+            "missing": [],
+        }
+    content = LESSONS_PATH.read_text()
+    if not content.strip():
+        return {
+            "check": "lessons_format",
+            "status": "fail",
+            "message": "lessons: .dev-flow/lessons.md is empty",
+            "fix": "Create .dev-flow/lessons.md with a header: '# Lessons Log\n\nAppend only. Never edit existing entries.\n\n---\n'",
+            "missing": [],
+        }
+    # Check each entry has required fields
+    entries = content.split('## ')
+    malformed = []
+    for entry in entries[1:]:  # skip header
+        lines = entry.split('\n')
+        header = lines[0].strip() if lines else ""
+        body = '\n'.join(lines[1:]) if len(lines) > 1 else ""
+        has_error = "**Error:**" in body
+        has_fix = "**Fix:**" in body
+        if header and not (has_error and has_fix):
+            malformed.append(header[:60])
+    if malformed:
+        return {
+            "check": "lessons_format",
+            "status": "fail",
+            "message": f"lessons: {len(malformed)} malformed entry/entries (missing **Error:** or **Fix:**)",
+            "fix": "Fix entries in .dev-flow/lessons.md — each entry needs **Error:** and **Fix:** fields",
+            "missing": malformed,
+        }
+    return {
+        "check": "lessons_format",
+        "status": "pass",
+        "message": "lessons: format OK",
+        "fix": "",
+        "missing": [],
+    }
 
 def find_latest_plan() -> pathlib.Path | None:
     """Find the most recently modified .md plan file, excluding premortem plans."""
@@ -131,6 +183,67 @@ def check_lint_config() -> dict:
         "missing": [],
     }
 
+def check_adr_format() -> dict:
+    """Validate ADR files in docs/decisions/ (AR-5)."""
+    if not DECISIONS_DIR.exists():
+        return {
+            "check": "adr_format",
+            "status": "fail",
+            "message": "docs/decisions/: directory not found",
+            "fix": "Create docs/decisions/ and add ADR files",
+            "missing": [],
+        }
+    adr_files = list(DECISIONS_DIR.glob("*.md"))
+    if not adr_files:
+        return {
+            "check": "adr_format",
+            "status": "fail",
+            "message": "docs/decisions/: no ADR files found",
+            "fix": "Create at least one ADR file (e.g., 0001-approach-selection.md)",
+            "missing": [],
+        }
+    errors = []
+    for adr in adr_files:
+        fname_errors = []
+        # Filename must match NNNN-*.md
+        if not adr.stem[:4].isdigit():
+            fname_errors.append(f"filename lacks 4-digit prefix")
+        content = adr.read_text()
+        # Required fields
+        required = ["Date:", "Status:", "## Context", "## Decision", "## Consequences"]
+        for field in required:
+            if field not in content:
+                fname_errors.append(f"missing '{field}'")
+        # Status value
+        status_match = re.search(r"Status:\s*(\S+)", content)
+        if status_match:
+            status_val = status_match.group(1).rstrip(",;")
+            if status_val not in VALID_ADR_STATUSES:
+                fname_errors.append(f"invalid Status '{status_val}' (must be one of {', '.join(sorted(VALID_ADR_STATUSES))})")
+        else:
+            fname_errors.append("Status: field not found")
+        # Date format YYYY-MM-DD
+        date_match = re.search(r"Date:\s*(\d{4}-\d{2}-\d{2})", content)
+        if not date_match:
+            fname_errors.append("Date: not in YYYY-MM-DD format")
+        if fname_errors:
+            errors.append(f"{adr.name}: {'; '.join(fname_errors)}")
+    if errors:
+        return {
+            "check": "adr_format",
+            "status": "fail",
+            "message": f"ADR format: {len(errors)} file(s) with errors",
+            "fix": "Fix each ADR: use 4-digit prefix, YYYY-MM-DD date, valid Status values, all required sections",
+            "missing": errors,
+        }
+    return {
+        "check": "adr_format",
+        "status": "pass",
+        "message": f"ADR format: OK ({len(adr_files)} file(s) validated)",
+        "fix": "",
+        "missing": [],
+    }
+
 def check_deferred_decisions_clean() -> dict:
     """No deferred decisions with Status=fake should be pending."""
     if not TRACKER_PATH.exists():
@@ -154,9 +267,11 @@ def main() -> int:
         check_ports_defined(),
         check_fake_adapters(),
         check_deferred_decisions_clean(),
+        check_adr_format(),
+        check_lessons_format(),
     ]
     for c in checks:
-        symbol = {"pass": "✅", "fail": "❌", "skip": "⏭️"}[c["status"]]
+        symbol = {"pass": "[PASS]", "fail": "[FAIL]", "skip": "[SKIP]", "warn": "[WARN]"}[c["status"]]
         print(f"{symbol} {c['message']}")
     return gate_exit("phase5b", checks)
 

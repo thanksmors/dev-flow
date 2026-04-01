@@ -139,6 +139,49 @@ Before presenting the integration options, verify:
    - content: completion summary — what was built, final test count, key decisions, lessons learned, any follow-up work identified
 2. This enables future sessions on this project to immediately load the full context
 
+### Lessons Sync (DC-5 — Two-Tier Lessons)
+
+After Phase 8 generates the completion report:
+
+1. Orchestrator scans `.dev-flow/lessons.md`
+2. Presents high-value lessons for promotion:
+   ```
+   Promising lessons detected:
+   - {title}: {one-line summary} [Promote] [Skip]
+   - {title}: {one-line summary} [Promote] [Skip]
+
+   [Promote all] [Select] [Skip]
+   ```
+3. For each promoted lesson, creates a file in `dev-flow-plugin/lessons/{category}/{slug}.md`:
+   ```markdown
+   # {slug} — {title}
+
+   **Framework/Phase:** {framework} / {phase}
+   **Severity:** {critical | important | minor}
+   **Date:** {original lesson date}
+   **Source project:** {project name}
+
+   ## Context
+   {original error section}
+
+   ## Lesson
+   {original fix section distilled into an actionable rule}
+
+   ## Rule
+   {one-sentence actionable rule for future projects}
+   ```
+4. Updates `dev-flow-plugin/lessons/TOPICS.md` index:
+   ```markdown
+   ## {Category}
+   - [{slug}]({category}/{slug}.md)
+   ```
+5. Lesson category taxonomy:
+   - `testing/` — test runner, E2E, isolation
+   - `architecture/` — component patterns, layer boundaries, ports & adapters
+   - `framework-{name}/` — framework-specific (e.g., `framework-nuxt/`)
+   - `workflow/` — process gaps, phase gaps, gate failures
+   - `security/`
+
 ## Final Output
 
 After the user selects an integration option, execute it and confirm:
