@@ -35,3 +35,9 @@ This is a **HARD-GATE** — Phase 6 cannot begin until gate_phase5b.py exits 0.
 ## Additional Gate Items (Multi-Page)
 
 - [ ] Navigation scaffolding files (`layouts/`, `pages/`, `routes.ts`) match navigation-spec.md (if multi-page)
+
+### Insforge Configuration
+
+- [ ] Insforge connection script exists and is wired in DI composition
+- [ ] Base URL configured in .env (INSFORGE_BASE_URL)
+- [ ] API key configured in .env (INSFORGE_API_KEY)
