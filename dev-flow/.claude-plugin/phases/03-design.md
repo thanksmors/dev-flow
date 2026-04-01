@@ -185,11 +185,11 @@ For each flow, decide:
 
 Place in `.dev-flow/architecture/sequences/`. Use C4Dynamic (` ```mermaid C4Dynamic`) or sequenceDiagram format.
 
-### 3.6 Navigation & Scaffolding (Multi-Page Only)
+### 3.7 Navigation & Scaffolding (Multi-Page Only)
 
 **Skip this step if single-page. If multi-page (detected in 3.0), proceed.**
 
-#### 3.6.1 Create sitemap.md
+#### 3.7.1 Create sitemap.md
 
 Write `.dev-flow/design/sitemap.md`:
 
@@ -215,7 +215,7 @@ graph TD
 
 Fill in every discovered page. Flag orphan pages (no incoming links) with a note.
 
-#### 3.6.2 Create navigation-spec.md
+#### 3.7.2 Create navigation-spec.md
 
 Write `.dev-flow/design/navigation-spec.md`:
 
@@ -236,19 +236,19 @@ Write `.dev-flow/design/navigation-spec.md`:
 {directory tree showing layouts/, pages/, routes.ts}
 ```
 
-#### 3.6.3 Verify sitemap coverage
+#### 3.7.3 Verify sitemap coverage
 
 - Every `.vue` file in `pages/` or `app/pages/` appears in the sitemap table
 - Every page in the table appears in the mermaid diagram
 - Orphan pages are flagged (noted in the table with "ORPHAN" in Linked From)
 
-#### 3.6.4 Update state
+#### 3.7.4 Update state
 
 Record artifact paths in `state.json`:
 - `sitemap`: `.dev-flow/design/sitemap.md`
 - `navigationSpec`: `.dev-flow/design/navigation-spec.md`
 
-### 3.7 Deferred Architectural Decisions
+### 3.8 Deferred Architectural Decisions
 
 Explicitly document decisions being **deferred**:
 
@@ -273,7 +273,7 @@ For each deferred decision in this phase:
 2. Set initial Status: `fake` or `pending`
 3. Set the trigger criteria from what was documented above
 
-### 3.8 Write Architecture Decision Records
+### 3.9 Write Architecture Decision Records
 
 For every significant design choice made in steps 3.1–3.7, write a separate ADR file in `docs/decisions/`.
 
@@ -292,7 +292,7 @@ See the ADR format in `${CLAUDE_PLUGIN_ROOT}/references/c4-documentation.md`.
 
 Update `state.json` with all artifact paths.
 
-### 3.8 Generate Documentation Sections
+### 3.10 Generate Documentation Sections
 
 Create `docs/architecture/` with five sections derived from what Phase 3 already produced. Do NOT write these from scratch — extract from existing artifacts.
 
