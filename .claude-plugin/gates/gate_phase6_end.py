@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 """Gate Phase 6 End: Deferred-decision gate — all open items must be resolved."""
 
 import sys
@@ -62,7 +62,7 @@ def main() -> int:
     print("=== Gate Phase 6 End: Deferred-Decision Gate ===\n")
     print(f"Tracker: {TRACKER_PATH}\n")
     c = check_open_decisions()
-    symbol = {"pass": "✅", "fail": "❌", "skip": "⏭️"}[c["status"]]
+    symbol = {"pass": "[PASS]", "fail": "[FAIL]", "skip": "[SKIP]"}[c["status"]]
     print(f"{symbol} {c['message']}")
     if c["status"] == "fail":
         # Print detail for each open item
