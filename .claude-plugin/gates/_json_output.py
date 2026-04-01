@@ -2,6 +2,9 @@
 
 Prints machine-readable JSON after the human-readable output.
 Format is designed for easy parsing by fix loop dispatch logic.
+
+Ensure gates are run with PYTHONIOENCODING=utf-8 on Windows to prevent
+UnicodeEncodeError when printing ASCII check symbols.
 """
 
 import json
