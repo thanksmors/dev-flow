@@ -15,8 +15,8 @@ Every claim of success must be backed by fresh verification evidence. No "tests 
 
 <HARD-GATE — Fake Adapters First>
 Before any task involving an external dependency begins:
-✅ A fake adapter interface MUST be defined first (port at `layers/{domain}/ports/`, fake at `layers/{domain}/adapters/FakeXyzAdapter.ts` — see `layer-scaffold.md`)
-✅ The fake adapter MUST be wired and working (returns realistic data) before the real adapter is touched
+✅ A fake adapter MUST be defined first (returns realistic in-memory data)
+✅ The fake adapter MUST be wired and working before the real adapter is touched
 ✅ The real adapter MUST NOT be implemented until the fake adapter passes verification
 ✅ The fake adapter stays permanently — it is not deleted when the real adapter is added
 
@@ -45,14 +45,6 @@ Before implementing any task from the plan, validate its size against these crit
 **Too big** = bundles multiple independent decisions (e.g., "implement OAuth" is really: choose library, design token storage, implement flow, build UI, handle errors). Fix: split into independent right-sized tasks.
 
 If a task fails sizing → adjust the plan before dispatching the implementer. Do not proceed with tasks that are too small or too big.
-</HARD-GATE>
-
-<HARD-GATE — Phase 0 Prerequisites>
-Before Phase 6 begins, confirm Phase 0 prerequisites passed. If not yet run:
-1. Read `dev-flow/preferences/defaults/prerequisites.md`
-2. Execute each check
-3. If ANY FAIL → block and print remediation instructions
-4. Do NOT proceed until all checks pass
 </HARD-GATE>
 
 ## 6.0 Pre-Flight Check (HARD-GATE)
@@ -110,16 +102,6 @@ For each task, run the autonomous per-task loop:
 - If previous task exists but is uncommitted → do NOT start this task until the prior task is verified and committed
 - If this is the first task in a slice → record slice start in state.json
 
-<HARD-GATE — Nuxt UI Component Lookup>
-Before any task involving UI components or custom CSS:
-✅ Search Nuxt UI v4 component registry for existing components
-✅ If found: use Nuxt UI component, do not build custom
-✅ If not found: document "No Nuxt UI equivalent: [reason]" in task notes
-✅ If uncertain: ask before proceeding
-
-Check: https://ui.nuxt.dev
-</HARD-GATE>
-
 **Domain Glossary Check:**
 Before dispatching the implementer for any task that touches domain code:
 1. Read `docs/domain-glossary.md` (if it exists)
@@ -130,7 +112,7 @@ Before dispatching the implementer for any task that touches domain code:
 
 Dispatch the implementer agent (`${CLAUDE_PLUGIN_ROOT}/agents/implementer.md`) with:
 - Full task text (objectives, files, steps)
-- Scene-setting context: what phase we're in, what was built in previous tasks, relevant C4 architecture context (container/component this task modifies), relevant adapter interfaces from `docs/decisions/`, relevant file paths from `${CLAUDE_PLUGIN_ROOT}/references/layer-scaffold.md`
+- Scene-setting context: what phase we're in, what was built in previous tasks, relevant C4 architecture context (container/component this task modifies), relevant adapter interfaces from `docs/decisions/`
 - Project tech stack and conventions
 - **Fake Adapters First reminder**: For any task involving external dependencies (APIs, databases, auth, observability), the fake adapter MUST be implemented before the real adapter. The implementer must demonstrate the fake adapter works end-to-end before any real adapter is touched.
 
@@ -570,7 +552,6 @@ Before Phase 7, verify ALL of the following:
 - [ ] `docs/architecture/` sections updated where implementation diverged from design
 - [ ] `state.json` reflects completed work and verificationLog is populated
 - [ ] ALL new external dependencies have fake adapters that walk before real adapters are introduced
-- [ ] All UI tasks have Nuxt UI component lookup documented
 - [ ] Self-critique pass completed for every task (correctness, style, performance, security)
 - [ ] Domain glossary at `docs/domain-glossary.md` referenced during implementation (if domain code was touched)
 - [ ] All 7 test types are represented in the test suite (check `references/testing-pyramid.md` for the complete list)
