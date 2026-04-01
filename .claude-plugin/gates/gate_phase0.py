@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 """Gate Phase 0: Verify prerequisites before dev-flow Phase 0 completes."""
 
 import subprocess
@@ -62,7 +62,7 @@ def check_plugin_root() -> dict:
 def main() -> int:
     checks = [check_gh_auth(), check_git_remote(), check_plugin_root()]
     for c in checks:
-        symbol = "✅" if c["status"] == "pass" else "❌"
+        symbol = "[PASS]" if c["status"] == "pass" else "[FAIL]"
         print(f"{symbol} {c['message']}")
     return gate_exit("phase0", checks)
 
