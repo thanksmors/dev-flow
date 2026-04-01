@@ -602,4 +602,6 @@ Before presenting options:
 1. Run Section 6.4 Deferred-Decision Gate — ALL open items must be resolved, re-deferred, or skipped before proceeding
 2. Present Phase 7 checkpoint options:
 
+**After Extras completes, proceed to Phase 7 (gap analysis).**
+
 Options: [Continue to Gap Analysis] [Pause] [End]
