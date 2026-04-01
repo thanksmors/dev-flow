@@ -9,6 +9,19 @@ description: Create comprehensive design documents including C4 architecture, fo
 
 ## Steps
 
+### 3.0 Multi-Page Detection
+
+Before drafting C4 diagrams, check whether this is a multi-page project:
+
+- Read Phase 1 and Phase 2 artifacts for multi-page signals:
+  - Route definitions across multiple files
+  - Multiple `.vue` page components in `pages/` or `app/pages/`
+  - User stories mentioning navigation between pages
+- **Rule:** When in doubt, assume multi-page and scaffold anyway.
+
+If multi-page is detected (or ambiguous), add a `Navigation & Scaffolding` sub-step
+after step 3.6 and before step 3.8.
+
 ### 3.1 Design the Walking Skeleton
 
 Define the **thinnest possible end-to-end slice** that demonstrates:
@@ -87,8 +100,8 @@ docs/
 
 1. **Model block** — define people, softwareSystems, containers, and components
 2. **Views block** — systemContext, container, and component views with `autoLayout` and styles
-3. **`!docs architecture/`** — connects the prose doc sections (written in step 3.8)
-4. **`!adrs decisions/`** — connects the ADR files (first one written in step 3.7)
+3. **`!docs architecture/`** — connects the prose doc sections (written in step 3.10)
+4. **`!adrs decisions/`** — connects the ADR files (first one written in step 3.9)
 
 **Component loop (enumerate-first):**
 
@@ -172,7 +185,70 @@ For each flow, decide:
 
 Place in `.dev-flow/architecture/sequences/`. Use C4Dynamic (` ```mermaid C4Dynamic`) or sequenceDiagram format.
 
-### 3.7 Deferred Architectural Decisions
+### 3.7 Navigation & Scaffolding (Multi-Page Only)
+
+**Skip this step if single-page. If multi-page (detected in 3.0), proceed.**
+
+#### 3.7.1 Create sitemap.md
+
+Write `.dev-flow/design/sitemap.md`:
+
+```markdown
+# Sitemap — {project name}
+
+## Pages
+
+| Page | URL Path | Purpose | Links To | Linked From |
+|------|----------|---------|----------|-------------|
+| {PageName} | /{path} | {one-line purpose} | {comma-separated pages} | {comma-separated pages} |
+
+## Navigation Flow
+
+```mermaid
+graph TD
+    Home --> About
+    Home --> Login
+    Login -->|post-auth| Dashboard
+    Dashboard --> Logout
+```
+```
+
+Fill in every discovered page. Flag orphan pages (no incoming links) with a note.
+
+#### 3.7.2 Create navigation-spec.md
+
+Write `.dev-flow/design/navigation-spec.md`:
+
+```markdown
+# Navigation Spec — {project name}
+
+## Layouts
+
+| Layout | Used By | Notes |
+|--------|---------|-------|
+| DefaultLayout | Public pages | Nav + Footer |
+| AuthLayout | Login, Register | No Nav, centered content |
+
+## Nav Component
+{describe nav: links, auth-awareness, mobile behavior}
+
+## Route Organization
+{directory tree showing layouts/, pages/, routes.ts}
+```
+
+#### 3.7.3 Verify sitemap coverage
+
+- Every `.vue` file in `pages/` or `app/pages/` appears in the sitemap table
+- Every page in the table appears in the mermaid diagram
+- Orphan pages are flagged (noted in the table with "ORPHAN" in Linked From)
+
+#### 3.7.4 Update state
+
+Record artifact paths in `state.json`:
+- `sitemap`: `.dev-flow/design/sitemap.md`
+- `navigationSpec`: `.dev-flow/design/navigation-spec.md`
+
+### 3.8 Deferred Architectural Decisions
 
 Explicitly document decisions being **deferred**:
 
@@ -197,7 +273,7 @@ For each deferred decision in this phase:
 2. Set initial Status: `fake` or `pending`
 3. Set the trigger criteria from what was documented above
 
-### 3.8 Write Architecture Decision Records
+### 3.9 Write Architecture Decision Records
 
 For every significant design choice made in steps 3.1–3.7, write a separate ADR file in `docs/decisions/`.
 
@@ -216,7 +292,7 @@ See the ADR format in `${CLAUDE_PLUGIN_ROOT}/references/c4-documentation.md`.
 
 Update `state.json` with all artifact paths.
 
-### 3.8 Generate Documentation Sections
+### 3.10 Generate Documentation Sections
 
 Create `docs/architecture/` with five sections derived from what Phase 3 already produced. Do NOT write these from scratch — extract from existing artifacts.
 
@@ -319,6 +395,9 @@ Before checkpoint, verify:
   Written in Phase 3 once UI/UX is understood. Describes user-facing flows
   (screens, inputs, outputs) with no implementation details. Cross-reference
   acceptance criteria to user manual sections in the design spec.
+- [ ] Sitemap.md exists and includes mermaid diagram of page connections
+- [ ] All discovered pages appear in the sitemap (no orphan pages without explicit flag)
+- [ ] Navigation spec covers layouts, nav components, and route organization
 
 ## User Manual Template
 
@@ -392,3 +471,4 @@ Present to the user:
 5. **Any gaps** in the design
 - Run `/frontend-audit` to check your component designs for AI slop patterns before proceeding
 6. Options: [Continue to Pre-Mortem] [Pause] [End]
+   - Navigation: sitemap.md and navigation-spec.md artifacts produced (if multi-page)

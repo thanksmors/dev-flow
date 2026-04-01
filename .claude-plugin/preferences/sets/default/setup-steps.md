@@ -35,64 +35,6 @@ NUXT_PUBLIC_APP_URL=http://localhost:3000
 EOF
 ```
 
-## 1.6 Install Nuxt UI and Google Fonts
-
-```bash
-cd {project-name}
-bun add @nuxt/ui @nuxtjs/google-fonts nuxt-icon
-```
-
-## 1.7 Configure Nuxt UI Theme
-
-Add to `nuxt.config.ts` inside `defineNuxtConfig`:
-
-```typescript
-export default defineNuxtConfig({
-  modules: ['@nuxt/ui', '@nuxtjs/google-fonts', 'nuxt-icon'],
-  googleFonts: {
-    families: {
-      'DM+Sans': [400, 500, 600, 700],
-      'Fraunces': [400, 700],
-    },
-  },
-  ui: {
-    theme: {
-      colors: {
-        primary: { 50: '#fffbeb', 100: '#fef3c7', 500: '#f59e0b', 900: '#78350f' },
-      },
-      font: { sans: "'DM Sans', sans-serif", heading: "'Fraunces', serif" },
-    }
-  }
-})
-```
-
-## 1.8 Create Custom CSS Variables
-
-Create `assets/css/main.css`:
-
-```css
-/* Custom spacing scale (4pt base) */
-:root {
-  --space-1: 0.25rem;  /* 4px */
-  --space-2: 0.5rem;   /* 8px */
-  --space-3: 0.75rem;  /* 12px */
-  --space-4: 1rem;     /* 16px */
-  --space-6: 1.5rem;   /* 24px */
-  --space-8: 2rem;     /* 32px */
-  --space-12: 3rem;    /* 48px */
-  --space-16: 4rem;    /* 64px */
-}
-
-/* Motion easing tokens */
-:root {
-  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
-  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
-  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
-  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
-}
-```
-
 ## 2. Install dependencies
 ```bash
 bun install
@@ -185,4 +127,3 @@ export const {domain}Adapter = new Fake{Domain}Adapter()
 
 Verify the skeleton walks before adding any real adapter.
 See PRINCIPLES.md → Fake Adapters First (non-negotiable).
-```
