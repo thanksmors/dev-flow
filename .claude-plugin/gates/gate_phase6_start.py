@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 """Gate Phase 6 Start: Pre-flight check — scan for missing env vars and third-party deps."""
 
 import sys
@@ -159,7 +159,7 @@ def main() -> int:
         check_third_party_urls(),
     ]
     for c in checks:
-        symbol = {"pass": "✅", "fail": "❌", "skip": "⏭️"}[c["status"]]
+        symbol = {"pass": "[PASS]", "fail": "[FAIL]", "skip": "[SKIP]"}[c["status"]]
         print(f"{symbol} {c['message']}")
     return gate_exit("phase6_start", checks)
 
