@@ -111,7 +111,7 @@ After all files: write (overwrite) updated preferences to `.dev-flow/preferences
 
 ### Step 0.4 — Prerequisites Gate (HARD-GATE)
 
-Run: `python3 ${CLAUDE_PLUGIN_ROOT}/gates/gate_phase0.py`
+Run: `PYTHONIOENCODING=utf-8 python ${CLAUDE_PLUGIN_ROOT}/gates/gate_phase0.py`
 
 - Exit 0 → all checks passed. Proceed to Step 0.4b.
 - Exit 1 → gate failed.
@@ -122,7 +122,7 @@ Run: `python3 ${CLAUDE_PLUGIN_ROOT}/gates/gate_phase0.py`
 3. Dispatch one fixer agent per failing item in parallel (max 3 agents) using `${CLAUDE_PLUGIN_ROOT}/agents/fixer-agent.md`
    - Each fixer receives: `fix_item` (check, fix, missing), `gate_name: "phase0"`, `round: 1`, `what_was_tried: []`
 4. Wait for all fixers to complete
-5. Re-run gate_phase0.py
+5. Re-run: `PYTHONIOENCODING=utf-8 python ${CLAUDE_PLUGIN_ROOT}/gates/gate_phase0.py`
 6. If exit 0 → print "✅ Gate fixed." Proceed to Step 0.4b.
 7. If exit 1 → Round 2
 
@@ -130,7 +130,7 @@ Run: `python3 ${CLAUDE_PLUGIN_ROOT}/gates/gate_phase0.py`
 1. Re-parse JSON from gate output — remaining items are the ones still failing
 2. Dispatch up to 2 fixer agents in parallel, each with full context of what Round 1 tried for this item
    - Each fixer receives: `fix_item`, `gate_name: "phase0"`, `round: 2`, `what_was_tried: [round1 attempt summary]`
-3. Re-run gate_phase0.py
+3. Re-run: `PYTHONIOENCODING=utf-8 python ${CLAUDE_PLUGIN_ROOT}/gates/gate_phase0.py`
 4. If exit 0 → print "✅ Gate fixed after escalation." Proceed to Step 0.4b.
 5. If exit 1 → present remaining issues to user. Options: [Pause] [End]
 
@@ -177,9 +177,35 @@ After Phase 0 completes, scan for `.dev-flow/lessons.md`.
 If it exists:
   - Read it and factor any relevant entries into the session context
   - If a LESSONS.md entry is relevant to the current feature, mention it during Phase 1 (step 1.3)
-If a gap is encountered during any phase:
-  - Append a new entry to `.dev-flow/lessons.md` (never edit existing entries)
-  - Use the format from phases/01-discovery.md step 1.3
+
+Also scan `dev-flow-plugin/lessons/` (plugin lessons library):
+  - Filter by current framework (e.g., `nuxt`), phase (e.g., `implementation`), and stack (e.g., `nuxt-ui`, `insforge`)
+  - Surface top matching lessons in the session context
+  - Inject relevant lessons into implementer agent dispatches during Phase 6 (see DC-4)
+
+### LESSONS.md Append Rule (DC-3 — Cross-Cutting)
+During ANY phase, whenever:
+- A gap is identified
+- An unexpected error occurs
+- A workaround is discovered
+- A question reveals a workflow blind spot
+
+→ Append to `.dev-flow/lessons.md` immediately. Not at the end of the phase. At the moment of discovery.
+
+Format:
+```markdown
+## {date} — {one-line title}
+
+**Error:** {what went wrong}
+
+**Root cause:** {what caused it}
+
+**Fix:** {what was done, or "pending" if deferred}
+
+**Phase:** {which phase this occurred in}
+```
+
+Never edit existing entries — append-only.
 
 ### Step 0.6 — YOLO prompt (on `continue` reaching Phase 6, or at Phase 6 start)
 
@@ -204,6 +230,11 @@ Before checking for existing state:
 1. `mem_search "dev-flow {project name}"` to check for prior sessions
 2. If found: present brief summary to user ("I found prior work: Phase {N} completed, working on {feature}")
 3. Ask: "Continue from where we left off, or start fresh?"
+4. **DC-1 Plugin Lessons Scan:** Scan `dev-flow-plugin/lessons/` (if it exists) for lesson files matching the current project context:
+   - Match by `framework`, `phase`, and `stack` frontmatter
+   - Surface top matching lessons as a brief list in the Phase 0 output
+   - Read `dev-flow-plugin/lessons/TOPICS.md` for the topic index
+5. **DC-1 Project Lessons:** Read `.dev-flow/lessons.md` if it exists — surface recent entries as "context from this project"
 
 ---
 

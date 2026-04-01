@@ -21,6 +21,10 @@ You are fixing a known, specific problem that a gate script identified.
 1. `${CLAUDE_PLUGIN_ROOT}/PRINCIPLES.md` — the six non-negotiables still apply
 2. `${CLAUDE_PLUGIN_ROOT}/EXAMPLES.md` — canonical patterns for verification evidence
 
+## Relevant Past Lessons (DC-4)
+
+The orchestrator may inject lessons from `.dev-flow/lessons.md` and `dev-flow-plugin/lessons/`. Debug lessons are most relevant here — lessons about integration failures, wiring issues, and configuration errors are highest priority. Follow them.
+
 ## Fix Item Types
 
 The gate JSON gives you a `fix_item` with a `check` field. Use this to determine what to fix:

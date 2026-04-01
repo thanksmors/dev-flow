@@ -13,13 +13,35 @@ You cannot enter Phase 7 (Gap Analysis) until:
 ✅ Full test suite has been run and passes (verification-before-completion evidence)
 ✅ All spec and quality reviews are approved
 ✅ state.json reflects all completed work
+✅ **Both Phase 6 gates passed:**
+  - gate_phase6_evidence.py exited 0
+  - gate_phase6_end.py exited 0
 </HARD-GATE>
 
 When the HARD-GATE passes: log gate pass in state.json under `gatePasses.prePhase7`, then proceed.
 
 ## Steps
 
-### 7.1 Systematic Gap Analysis
+### 7.1 YOLO Decision Review (HI-2)
+
+**Before gap analysis begins**, review any YOLO auto-selected decisions from Phase 6.
+
+1. Read `.dev-flow/state.json` for `yoloFlaggedDecisions[]`
+2. If array is non-empty, present each YOLO ADR:
+   ```
+   YOLO Decision — auto-selected during Phase 6:
+   ADR-{NN}: {title}
+   {one-line summary of what was decided}
+
+   [Confirm this decision] [Revise it]
+   ```
+3. If user selects Revise → pause to let user modify the ADR
+4. Gate re-checks after revision
+5. Only proceed to gap analysis once all YOLO decisions are confirmed
+
+If `yoloFlaggedDecisions[]` is empty: proceed immediately to 7.2.
+
+### 7.2 Systematic Gap Analysis
 
 Analyze the implementation across these dimensions:
 
@@ -71,7 +93,7 @@ Analyze the implementation across these dimensions:
   - Check: generic filler language, vague "a modern app", no actual description of what was built
   - If it fails → add to task list for Phase 8
 
-### 7.1.x — LESSONS.md Write Trigger
+### 7.2.x — LESSONS.md Write Trigger
 If any gap is found during this session:
   - Append to `.dev-flow/lessons.md` with:
     - Context: what gap was found
@@ -79,14 +101,14 @@ If any gap is found during this session:
     - Resolution: what was done to fix it (or "pending" if deferred)
   - Never edit existing entries — only append new ones
 
-### 7.1.x — AI Slop Test Check
+### 7.3.x — AI Slop Test Check
 
 For any UI work found in the gap analysis:
 - Run `/frontend-audit` on the rendered output
 - Does any component trigger the AI Slop Test?
 - If yes → add to gap list with `/frontend-critique` recommendation
 
-### 7.2 Document Findings
+### 7.3 Document Findings
 
 Write to `.dev-flow/reports/gap-analysis.md`:
 
@@ -124,7 +146,7 @@ Write to `.dev-flow/reports/gap-analysis.md`:
 |---|-----|----------|----------|-----------|
 ```
 
-### 7.3 Autonomous Gap Fix Loop
+### 7.4 Autonomous Gap Fix Loop
 
 This is an **autonomous loop** — iterate until all Critical and Important gaps are resolved. The user is not asked to approve fixes — the loop proceeds automatically and logs decisions.
 
@@ -160,7 +182,7 @@ After each gap-fix cycle: "Do the fixes require any documentation updates?"
 
 Max 5 iterations. If gaps remain after 5 iterations, document them and proceed.
 
-### 7.3.5 ADR Currency Review
+### 7.4.5 ADR Currency Review
 
 **Before the critical/important gap review, verify all ADRs in `docs/decisions/` are current.**
 
@@ -184,7 +206,7 @@ Max 5 iterations. If gaps remain after 5 iterations, document them and proceed.
 
 **This step runs once per gap-analysis session, before the gap-fix loop.**
 
-### 7.4 Update Structurizr Artifacts
+### 7.5 Update Structurizr Artifacts
 
 After each gap-fix cycle, update the following if anything changed:
 
