@@ -1,0 +1,20 @@
+{
+  "name": "thanksmors",
+  "owner": {
+    "name": "mors"
+  },
+  "metadata": {
+    "description": "Personal plugin marketplace for thanksmors"
+  },
+  "plugins": [
+    {
+      "name": "dev-flow",
+      "source": "./",
+      "description": "Multi-session development workflow: 8 structured phases, sequential subagent execution with per-task spec+quality review, opinionated preferences system, Engram memory integration, progressive deployment, TDD discipline, C4 documentation, HARD-GATE enforcement, autonomous fix loops, and context survival hooks.",
+      "author": {
+        "name": "mors"
+      },
+      "category": "development"
+    }
+  ]
+}
