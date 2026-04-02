@@ -1,0 +1,40 @@
+{
+  "version": "2.0.0",
+  "status": "not-started",
+  "currentPhase": 0,
+  "currentSubPhase": null,
+  "completedPhases": [],
+  "executionMode": null,
+  "checkpoints": {},
+  "artifacts": {
+    "designDoc": null,
+    "architectureDoc": null,
+    "c4Docs": [],
+    "premortemDoc": null,
+    "planDoc": null,
+    "decisionJournal": null,
+    "completionReport": null
+  },
+  "decisions": [],
+  "yoloFlaggedDecisions": [],
+  "risks": [],
+  "verificationLog": [],
+  "gatePasses": {
+    "prePhase6": { "passed": false, "timestamp": null },
+    "prePhase7": { "passed": false, "timestamp": null },
+    "prePhase8": { "passed": false, "timestamp": null }
+  },
+  "metadata": {
+    "startedAt": null,
+    "lastPausedAt": null,
+    "resumedAt": null,
+    "completedAt": null,
+    "totalSessions": 0,
+    "featureName": null,
+    "featureDescription": null,
+    "engramProjectKey": null,
+    "complexityTier": "simple | moderate | complex",
+    "phasesSkipped": [],
+    "skipReason": null
+  }
+}

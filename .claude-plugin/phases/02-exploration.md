@@ -122,7 +122,6 @@ Before checkpoint, verify:
 - [ ] Open questions are listed (if any)
 - [ ] State and decision journal are updated
 - [ ] Domain glossary created/updated at `docs/domain-glossary.md`
-- [ ] Integration points table entries match the directory structures documented in the same file (cross-check the table against the tree)
 
 ### Engram Save
 
