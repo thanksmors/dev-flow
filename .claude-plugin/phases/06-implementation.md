@@ -641,7 +641,7 @@ Before Phase 7, verify ALL of the following:
 - [ ] `docs/architecture/` sections updated where implementation diverged from design
 - [ ] `state.json` reflects completed work and verificationLog is populated
 - [ ] ALL new external dependencies have fake adapters that walk before real adapters are introduced
-- [ ] All UI tasks have Nuxt UI component lookup documented
+- [ ] All UI tasks have: (1) Nuxt UI component lookup documented, (2) Playwright/component tests or unit tests for the UI layer
 - [ ] Self-critique pass completed for every task (correctness, style, performance, security)
 - [ ] Domain glossary at `docs/domain-glossary.md` referenced during implementation (if domain code was touched)
 - [ ] All 7 test types are represented in the test suite (check `references/testing-pyramid.md` for the complete list)
