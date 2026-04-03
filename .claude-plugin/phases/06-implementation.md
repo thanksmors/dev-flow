@@ -399,6 +399,11 @@ Proceed to next task.
 
 ## 6.3 C4 Workspace Sync
 
+> **ALWAYS consult Context7 before writing or modifying `docs/workspace.dsl`.**
+> Use `mcp__plugin_context7_context7__resolve-library-id` with query `"structurizrdsl"` or `"structurizr python"`, then `mcp__plugin_context7_context7__query-docs` for the specific syntax needed (component, relationship, view, etc.).
+> Common needs: adding a component, changing a relationship label, creating a view, using `contains()`, `uses()`, `internal()`.
+> Do NOT write DSL from memory. Verify every DSL block against current Structurizr documentation.
+
 After each task that introduces architectural changes, update `docs/workspace.dsl`:
 
 **When to update (per-task check):**
