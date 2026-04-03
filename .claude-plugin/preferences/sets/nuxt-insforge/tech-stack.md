@@ -154,3 +154,26 @@ layers/{domain}/
     fake/              ← in-memory, always present, never deleted
     {provider}/        ← real adapters, swapped in one at a time
   types/               ← domain types, imported by ports and adapters
+
+## Guardrails Enforced (nuxt-insforge)
+
+These rules are enforced during Phase 6 for the nuxt-insforge preference set.
+
+### Page Directory Rule (G2)
+
+Pages must live in `layers/{domain}/pages/` for their domain.
+
+Nuxt auto-discovers pages from `layers/{domain}/pages/` directories. Pages placed outside these paths are silently ignored — no error, just a blank screen. The agent verifies this after every page-creating task.
+
+**Wrong:** `layers/links/pages/index.vue`
+**Correct:** `layers/links/pages/index.vue` (if the layer is named `links`)
+
+### U* Component Usage Rule (G3)
+
+When `@nuxt/ui` is installed, all form elements must use `U*` components.
+
+Raw HTML form elements (`<input>`, `<button>`, `<form>`, `<select>`, `<textarea>`) are forbidden in `.vue` files. Use the Nuxt UI equivalents: `<UInput>`, `<UButton>`, `<UForm>`, `<USelect>`, `<UTextarea>`.
+
+ESLint rule: `.claude-plugin/rules/no-raw-form-elements.js`
+
+The rule is active when `@nuxt/ui` is in `package.json`. It does not flag elements inside `<client-only>` or `<template #fallback>`.
