@@ -86,6 +86,37 @@ Tell the user: "Gate failed — running autonomous fix loop (Round 1). Will retr
 
 This is a **HARD-GATE** — no implementer subagents dispatch until pre-flight passes.
 
+## 6.0.5 Visual Verification Gate (G1 — one time, after first walking skeleton pages)
+
+**Fires once:** After the first task that creates `.vue` page files completes, before proceeding to the next task.
+
+**Requires:** `bun dev` is running on port 3000.
+
+**Script:** `.claude-plugin/gates/gate_visual_verification.py` (create in Task 3).
+
+- Exit 0 → visual verification passed. Proceed to step 6.1.
+- Exit 1 → verification failed.
+
+**Fix Loop — Round 1:**
+1. Parse the JSON block from gate output (between `<!---\n` and `\n-->`
+2. Extract `fix_items`
+3. Dispatch one fixer agent per failing item (max 3 agents) using `${CLAUDE_PLUGIN_ROOT}/agents/fixer-agent.md`
+4. Wait for all fixers to complete
+5. Re-run gate_visual_verification.py
+6. If exit 0 → print "✅ Visual verification passed." Proceed to 6.1.
+7. If exit 1 → Round 2
+
+**Fix Loop — Round 2 (if Round 1 didn't resolve):**
+1. Re-parse JSON from gate output — remaining items are the ones still failing
+2. Dispatch up to 2 fixer agents in parallel, each with full context of what Round 1 tried
+3. Re-run gate_visual_verification.py
+4. If exit 0 → print "✅ Visual verification passed after escalation." Proceed to 6.1.
+5. If exit 1 → present remaining issues to user. Options: [Pause] [End]
+
+**If bun dev is not running:** Prompt user to start it, then re-run the gate.
+
+This is a **HARD-GATE** — no further tasks dispatch until visual verification passes.
+
 ## 6.1 Execution Mode
 
 Only one mode exists:
@@ -109,6 +140,14 @@ For each task, run the autonomous per-task loop:
 - Has the previous task's changes been committed? (check `git status`)
 - If previous task exists but is uncommitted → do NOT start this task until the prior task is verified and committed
 - If this is the first task in a slice → record slice start in state.json
+
+**Visual Verification Gate (G1 — per-task check):**
+
+At the start of each task's loop, check `state.json` for `visualVerificationDone`. If false and the current task creates `pages/**/*.vue` files:
+1. Run the `gate_visual_verification.py` script
+2. On exit 0: set `visualVerificationDone: true` in state.json, log "G1 visual verification: PASS"
+3. On exit 1: trigger the fix loop described in Section 6.0.5
+4. Proceed to next steps (spec review, quality review, etc.)
 
 <HARD-GATE — Nuxt UI Component Lookup>
 Before any task involving UI components or custom CSS:
