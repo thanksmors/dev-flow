@@ -74,6 +74,79 @@ agentTriggered: true
 # If two layers need the same composable, duplicate it.
 # Move to core/ only when a third layer needs it. Duplication is intentional here.
 
+# App Shell & Layouts
+
+## `app.vue` — minimal
+Keep it minimal. All logic lives in composables and layers.
+
+```vue
+<!-- app.vue -->
+<template>
+  <NuxtErrorBoundary>
+    <NuxtLayout>
+      <NuxtPage />
+    </NuxtLayout>
+  </NuxtErrorBoundary>
+</template>
+```
+
+## Layouts directory
+
+```
+app/
+  layouts/
+    default.vue   ← app shell: nav, sidebar, footer, main content slot
+    auth.vue      ← centered card, no nav (login, register, password reset)
+    blank.vue     ← minimal — no nav, no sidebar (public landing, popups)
+```
+
+Layouts live in `app/layouts/` (top-level, app-wide). They are **cross-domain** — shared shells used by pages across multiple domains. Do NOT put layouts inside individual domain layers.
+
+Each layout is a standard Nuxt layout wrapping `<slot />` with `<NuxtPage />` content.
+
+## Layouts vs Domain Pages
+
+| Concern | Location |
+|---------|----------|
+| Shell (nav, sidebar, footer) | `app/layouts/default.vue` |
+| Auth shell (centered card) | `app/layouts/auth.vue` |
+| Public/minimal shell | `app/layouts/blank.vue` |
+| Route pages | `layers/{domain}/pages/` |
+| Domain components | `layers/{domain}/components/` |
+| Business logic | `layers/{domain}/composables/` |
+
+## Using layouts
+
+Set layout per-page with `definePageMeta`:
+
+```vue
+<!-- layers/auth/pages/login.vue -->
+<script setup>
+definePageMeta({ layout: 'auth' })
+</script>
+
+<!-- layers/orders/pages/index.vue -->
+<script setup>
+definePageMeta({ layout: 'default' })
+</script>
+```
+
+## Nested pages
+
+Nested routes work identically to standard Nuxt — no special config. A parent page's layout automatically wraps child pages.
+
+```
+layers/orders/pages/
+  index.vue           ← /orders — parent layout wraps this
+  [id].vue            ← /orders/:id — same parent layout
+```
+
+The parent `index.vue` uses `<NuxtPage />` to render child routes within its own layout slot.
+
+## Global middleware
+
+Global middleware (rate limiting, security headers) lives in `app/middleware/`. Domain-specific auth/permission middleware lives in `layers/{domain}/middleware/`.
+
 # Port & Adapter boundaries (within each layer):
 layers/{domain}/
   layers/{domain}/ports/   ← port interfaces (never touch external world directly)
