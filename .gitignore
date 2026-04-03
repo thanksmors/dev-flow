@@ -1,0 +1,19 @@
+# Claude Code
+.claude/
+
+# Dev Flow runtime state (created per-project when plugin runs)
+.dev-flow/
+
+# Temporary / cache files
+.temp/
+
+# Python bytecode
+__pycache__/
+*.pyc
+*.pyo
+
+# macOS
+.DS_Store
+
+# Node (if ever added)
+node_modules/
