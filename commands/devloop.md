@@ -223,7 +223,7 @@ If it exists:
   - If a LESSONS.md entry is relevant to the current feature, mention it during Phase 1 (step 1.3)
 If a gap is encountered during any phase:
   - Append a new entry to `.dev-flow/lessons.md` (never edit existing entries)
-  - Use the format from phases/01-discovery.md step 1.3
+  - Use the format from `${CLAUDE_PLUGIN_ROOT}/phases/01-discovery.md` step 1.3
 
 ### Step 0.8 — YOLO prompt (on `continue` reaching Phase 6, or at Phase 6 start)
 
@@ -344,17 +344,17 @@ Execute phases sequentially. For each phase:
 
 | # | Phase | File |
 |---|-------|------|
-| 1 | Discovery & Brainstorming | `phases/01-discovery.md` |
+| 1 | Discovery & Brainstorming | `${CLAUDE_PLUGIN_ROOT}/phases/01-discovery.md` |
 
-**Phase 1 now includes a complexity classification step (Step 1.2) that determines which subsequent phases run. See `references/complexity-ladder.md`.**
-| 2 | Codebase Exploration | `phases/02-exploration.md` |
-| 3 | Design & Architecture | `phases/03-design.md` |
-| 4 | Pre-Mortem | `phases/04-premortem.md` |
-| 5 | Planning | `phases/05-planning.md` |
-| 5b | Pre-Implementation Gate | `phases/05b-preimplementation-gate.md` |
-| 6 | Implementation (Sequential Subagents) | `phases/06-implementation.md` |
-| 7 | Gap Analysis & Loop | `phases/07-gap-analysis.md` |
-| 8 | Completion Report | `phases/08-completion.md` |
+**Phase 1 now includes a complexity classification step (Step 1.2) that determines which subsequent phases run. See `${CLAUDE_PLUGIN_ROOT}/references/complexity-ladder.md`.**
+| 2 | Codebase Exploration | `${CLAUDE_PLUGIN_ROOT}/phases/02-exploration.md` |
+| 3 | Design & Architecture | `${CLAUDE_PLUGIN_ROOT}/phases/03-design.md` |
+| 4 | Pre-Mortem | `${CLAUDE_PLUGIN_ROOT}/phases/04-premortem.md` |
+| 5 | Planning | `${CLAUDE_PLUGIN_ROOT}/phases/05-planning.md` |
+| 5b | Pre-Implementation Gate | `${CLAUDE_PLUGIN_ROOT}/phases/05b-preimplementation-gate.md` |
+| 6 | Implementation (Sequential Subagents) | `${CLAUDE_PLUGIN_ROOT}/phases/06-implementation.md` |
+| 7 | Gap Analysis & Loop | `${CLAUDE_PLUGIN_ROOT}/phases/07-gap-analysis.md` |
+| 8 | Completion Report | `${CLAUDE_PLUGIN_ROOT}/phases/08-completion.md` |
 
 ---
 
@@ -573,8 +573,8 @@ If a major debug is detected during Phase 6 (3+ consecutive implementer failures
 
 This plugin is designed to be easily extended:
 
-- **To add a phase**: Create a new file in `phases/` (e.g., `phases/04.5-security.md`), then add it to the Phase List table in this command and adjust phase numbering.
-- **To modify a phase**: Edit the phase file in `phases/`. Each phase is self-contained.
-- **To add a reference**: Create a new file in `references/` and reference it from the relevant phase file.
+- **To add a phase**: Create a new file in `${CLAUDE_PLUGIN_ROOT}/phases/` (e.g., `${CLAUDE_PLUGIN_ROOT}/phases/04.5-security.md`), then add it to the Phase List table in this command and adjust phase numbering.
+- **To modify a phase**: Edit the phase file in `${CLAUDE_PLUGIN_ROOT}/phases/`. Each phase is self-contained.
+- **To add a reference**: Create a new file in `${CLAUDE_PLUGIN_ROOT}/references/` and reference it from the relevant phase file.
 - **To modify quality gates**: Edit the Quality Gates section above or the per-phase quality gates in each phase file.
 - **To change the state schema**: Edit `templates/state.json` and update this command accordingly.
