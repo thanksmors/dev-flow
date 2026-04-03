@@ -250,6 +250,15 @@ Debugging escalation activates when ANY of:
 - The full test suite becomes non-functional (cannot run — broken deps, corrupted config)
 - Any error that blocks forward progress (unresolvable conflict, unhandled exception)
 
+> **ALWAYS consult Context7 when an error is unexpected or unexplained.**
+> Before running hypothesis agents or attempting any fix, use `mcp__plugin_context7_context7__query-docs` with the relevant library/framework and error keywords.
+> Examples:
+> - Nuxt error → query `"nuxt 3"` with the error message
+> - Prisma error → query `"prisma"` with the error message
+> - TypeScript error → query `"typescript"` with the error message
+> - Bun/Node error → query `"bun"` or `"node.js"` with the error message
+> If Context7 returns relevant documentation, incorporate the findings before dispatching hypothesis agents.
+
 ### Round 1 — 3 Hypothesis Agents
 
 1. `git reset --hard` to last green commit
