@@ -183,6 +183,24 @@ After implementer reports DONE:
 - If tests FAIL → send back to implementer to fix, re-run tests until pass
 - Only proceed when tests pass with evidence
 
+**G2 — Page Directory Check (if task touches pages/):**
+
+If the task creates or modifies `.vue` files in a `pages/` directory:
+1. Scan all changed `.vue` files in pages/ directories
+2. Verify each file's path matches `layers/{domain}/pages/` where domain matches the layer name
+3. If any page is outside `layers/{domain}/pages/`: fail task with message:
+   "Page found at wrong path: `{path}`. Pages must live in `layers/{domain}/pages/` for their domain."
+4. Dispatch fixer to move the page to the correct location
+5. Re-verify path, loop until clean
+
+**G3 — U* Component Usage Check (if task touches pages/):**
+
+If the task creates or modifies `.vue` files in a `pages/` directory:
+1. Run ESLint on the changed `.vue` files with the `no-raw-form-elements` rule
+2. If the rule fires: fail task with the ESLint output
+3. Fixer replaces raw elements with appropriate `U*` components
+4. Re-run ESLint until clean
+
 **2a. Infrastructure Config Verification (if applicable)**
 
 If this task changed any infrastructure config (docker-compose, .env, port mappings, nginx config, service URLs):
