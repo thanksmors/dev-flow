@@ -1,9 +1,9 @@
-# Dev Flow
+# devloop
 
 > [!TIP]
 > A rigorous multi-session development workflow for Claude Code. Structures work across 8 sequential phases with built-in quality gates, TDD discipline, systematic verification, and an opinionated preference system.
 
-Dev Flow keeps you in control across multiple sessions — remembers where you left off, forces you to verify before claiming done, and separates the thinking (design) from the doing (implementation).
+devloop keeps you in control across multiple sessions — remembers where you left off, forces you to verify before claiming done, and separates the thinking (design) from the doing (implementation).
 
 ## The 8 Phases
 
@@ -30,15 +30,15 @@ Dev Flow keeps you in control across multiple sessions — remembers where you l
 
 ```bash
 # Start a new workflow
-/dev-flow
+/devloop
 
 # Resume from last checkpoint
-/dev-flow continue
+/devloop continue
 ```
 
 ## Preference System
 
-Dev Flow uses a **multi-set preference system** — you choose a named preference set at Phase 0, which configures tech stack, testing philosophy, architecture patterns, and communication style for the session.
+devloop uses a **multi-set preference system** — you choose a named preference set at Phase 0, which configures tech stack, testing philosophy, architecture patterns, and communication style for the session.
 
 ### Preference Sets
 
@@ -146,4 +146,4 @@ These are copied from the chosen preference set at Phase 0. Modify them to overr
 | `.claude-plugin/phases/05b-preimplementation-gate.md` | Pre-implementation gate + fix loop |
 | `.claude-plugin/phases/06-implementation.md` | Full implementation workflow |
 | `.claude-plugin/phases/06-extras.md` | Post-completion supplementary work |
-| `.claude-plugin/commands/dev-flow.md` | The main orchestrating command |
+| `.claude-plugin/commands/devloop.md` | The main orchestrating command |

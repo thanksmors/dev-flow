@@ -1,5 +1,5 @@
 {
-  "description": "Context survival hooks for dev-flow multi-session workflow",
+  "description": "Context survival hooks for devloop multi-session workflow",
   "hooks": {
     "PreCompact": [
       {

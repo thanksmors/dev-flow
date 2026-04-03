@@ -1,3 +1,35 @@
+# Extras Phase Implementation Plan
+
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+
+**Goal:** Add a new Extras phase between Phase 6 and Phase 7, containing the AI-suggests → user-selects → implement → verify workflow.
+
+**Architecture:** Extras is a new markdown phase file that orchestrator calls by name. It reads project context, generates 6 suggestions, presents them to the user, implements selections with Phase 6 discipline, and re-verifies before passing to Phase 7 gap analysis.
+
+**Tech Stack:** devloop phase files (markdown), no code, no tests required for the phase itself.
+
+---
+
+## File Map
+
+| File | Change |
+|------|--------|
+| `dev-flow/.claude-plugin/phases/06-extras.md` | Create — new Extras phase |
+| `dev-flow/.claude-plugin/phases/06-implementation.md` | Modify — add Extras reference in Phase 6 checkpoint |
+| `.dev-flow/extras-backlog.md` | Create — backlog template (used by Extras phase) |
+
+---
+
+### Task 1: Create Extras phase file
+
+**Files:**
+- Create: `dev-flow/.claude-plugin/phases/06-extras.md`
+
+- [ ] **Step 1: Write the Extras phase file**
+
+Create `dev-flow/.claude-plugin/phases/06-extras.md` with the following content:
+
+```markdown
 ---
 name: extras
 description: AI proposes 6 improvements, user selects, implemented with Phase 6 discipline, verified before Phase 7
@@ -142,3 +174,111 @@ If no improvements were selected, this step is skipped.
 
 After Extras completes (or is skipped), proceed directly to Phase 7 gap analysis.
 Phase 7 audits the full system — including any improvements implemented in Extras.
+```
+
+- [ ] **Step 2: Commit**
+
+```bash
+git add dev-flow/.claude-plugin/phases/06-extras.md
+git commit -m "feat(devloop): add Extras phase
+
+Phase 6-extras: AI proposes 6 improvements, user selects,
+implemented with TDD, verified before Phase 7 gap analysis.
+Unselected items saved to extras-backlog.md.
+
+Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>"
+```
+
+---
+
+### Task 2: Add Extras reference to Phase 6 checkpoint
+
+**Files:**
+- Modify: `dev-flow/.claude-plugin/phases/06-implementation.md`
+
+- [ ] **Step 1: Add Extras to Phase 6 checkpoint options**
+
+Read the Phase 6 `## Phase 6 Checkpoint` section. Find the options list (the three options: Continue, Pause, End).
+
+Add a note after the options:
+```
+**After Extras completes, proceed to Phase 7 (gap analysis).**
+```
+
+Or insert as a fourth option:
+```
+- [Continue to Extras] — Phase 7: Gap Analysis will run after Extras
+```
+
+- [ ] **Step 2: Commit**
+
+```bash
+git add dev-flow/.claude-plugin/phases/06-implementation.md
+git commit -m "feat(devloop): reference Extras phase in Phase 6 checkpoint
+
+Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>"
+```
+
+---
+
+### Task 3: Create extras-backlog.md template
+
+**Files:**
+- Create: `.dev-flow/extras-backlog.md`
+
+- [ ] **Step 1: Create the backlog file**
+
+Create `.dev-flow/extras-backlog.md`:
+
+```markdown
+# Extras Backlog
+
+Unselected suggestions from Extras phase, accumulated across projects.
+Do not re-propose items already in this backlog.
+
+<!-- -- >
+```
+
+- [ ] **Step 2: Commit**
+
+```bash
+git add .dev-flow/extras-backlog.md
+git commit -m "feat(devloop): add extras-backlog.md template
+
+Backlog for unselected improvement suggestions from Extras phase.
+
+Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>"
+```
+
+---
+
+## Self-Review Checklist
+
+1. **Spec coverage:**
+   - [x] Extras 1: Generate 6 suggestions (2 per category) → Task 1, step 1
+   - [x] Extras 2: Present to user with format → Task 1, step 1
+   - [x] Extras 3: Implement selected with TDD → Task 1, step 1
+   - [x] Extras 4: Update backlog → Task 1, step 1
+   - [x] Extras 5: Phase 6 verification → Task 1, step 1
+   - [x] Backlog file creation → Task 3
+   - [x] Phase 6 checkpoint reference → Task 2
+
+2. **Placeholder scan:** No TBD/TODO. All steps have actual content.
+
+3. **Type consistency:** All file paths are exact. No type/signature drift.
+
+4. **No missing tasks:** All spec requirements mapped to tasks.
+
+---
+
+## Execution Options
+
+**Plan complete and saved to `docs/superpowers/plans/2026-04-01-extras-phase.md`.**
+
+Two execution options:
+
+**1. Subagent-Driven (recommended)** - I dispatch a fresh subagent per task, review between tasks, fast iteration
+
+**2. Inline Execution** - Execute tasks in this session using executing-plans, batch execution with checkpoints
+
+Which approach?

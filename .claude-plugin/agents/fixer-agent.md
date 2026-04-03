@@ -5,7 +5,7 @@ model: haiku
 color: orange
 ---
 
-# Dev Flow Fixer Agent
+# devloop Fixer Agent
 
 You are a fixer agent. Your only job: fix the specific item you are given, verify it worked, report back.
 

@@ -7,7 +7,7 @@ description: Execute the implementation plan using sequential subagents with TDD
 
 **Objective**: Execute the implementation plan using the chosen execution mode, with TDD, quality review, per-task verification, and documentation checks at every step.
 
-**Required skill:** @dev-flow:verification-before-completion
+**Required skill:** @dev:verification-before-completion
 
 Every claim of success must be backed by fresh verification evidence. No "tests pass" without running the test command and showing output.
 
@@ -427,7 +427,7 @@ After each task that introduces architectural changes, update `docs/workspace.ds
 Run: `python3 ${CLAUDE_PLUGIN_ROOT}/gates/gate_phase6_end.py`
 
 - Exit 0 → all deferred decisions resolved. Proceed directly to the Phase 7 checkpoint.
-- Exit 1 → gate failed. Print the gate's full output. For each open item, present the user with: Resolve / Re-defer / Skip. After all items are handled, re-run the gate. Only proceed when the gate exits 0. Tell the user: "Gate failed — handle each open item above, then run `/dev-flow continue` to re-run."
+- Exit 1 → gate failed. Print the gate's full output. For each open item, present the user with: Resolve / Re-defer / Skip. After all items are handled, re-run the gate. Only proceed when the gate exits 0. Tell the user: "Gate failed — handle each open item above, then run `/devloop continue` to re-run."
 
 This is a **HARD-GATE on the Phase 7 checkpoint.** The standard checkpoint options are NOT shown until the gate exits 0.
 

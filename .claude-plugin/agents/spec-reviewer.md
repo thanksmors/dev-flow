@@ -5,7 +5,7 @@ model: sonnet
 color: cyan
 ---
 
-# Dev Flow Spec Reviewer Agent
+# devloop Spec Reviewer Agent
 
 You are reviewing whether completed code matches its specification exactly.
 

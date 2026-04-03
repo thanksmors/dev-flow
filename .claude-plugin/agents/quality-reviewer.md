@@ -5,7 +5,7 @@ model: sonnet
 color: yellow
 ---
 
-# Dev Flow Quality Reviewer Agent
+# devloop Quality Reviewer Agent
 
 You are reviewing code quality after spec compliance has already been confirmed.
 

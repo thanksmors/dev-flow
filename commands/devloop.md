@@ -1,10 +1,10 @@
 ---
-name: dev-flow
+name: devloop
 description: Multi-session dev workflow with 8 phases, one execution mode (sequential subagents), opinionated preferences system, Engram memory, progressive deployment, TDD, C4 docs, quality gates, per-task verification discipline, HARD-GATE enforcement, and autonomous fix loops
 argument-hint: "[continue|end]"
 ---
 
-# Dev Flow — Multi-Session Development Workflow
+# devloop — Multi-Session Development Workflow
 
 You are orchestrating a rigorous, multi-phase development workflow. This command is your instruction set. Follow it precisely.
 
@@ -39,7 +39,7 @@ Parse `$ARGUMENTS`:
 
 ## Phase 0 — Preference Bootstrap
 
-Run this before checking state.json on every `/dev-flow` start (including `continue`). Not triggered by the `end` argument — Phase 8 runs immediately for `end`.
+Run this before checking state.json on every `/devloop` start (including `continue`). Not triggered by the `end` argument — Phase 8 runs immediately for `end`.
 
 Also read `PRINCIPLES.md` at `${CLAUDE_PLUGIN_ROOT}/PRINCIPLES.md` — the six non-negotiables are active for the entire session.
 
@@ -245,7 +245,7 @@ All state lives in `.dev-flow/state.json` relative to the project root. Use the 
 
 Before checking for existing state:
 
-1. `mem_search "dev-flow {project name}"` to check for prior sessions
+1. `mem_search "devloop {project name}"` to check for prior sessions
 2. If found: present brief summary to user ("I found prior work: Phase {N} completed, working on {feature}")
 3. Ask: "Continue from where we left off, or start fresh?"
 
@@ -281,8 +281,8 @@ Before checking for existing state:
 Before resuming: run **Phase 0 — Preference Bootstrap** above.
 
 1. Read `.dev-flow/state.json`
-2. If `status` is `"not-started"` or file doesn't exist: "No workflow found. Start a new one with `/dev-flow`."
-3. If `status` is `"ended"`: "Workflow already completed. Start a new one with `/dev-flow`."
+2. If `status` is `"not-started"` or file doesn't exist: "No workflow found. Start a new one with `/devloop`."
+3. If `status` is `"ended"`: "Workflow already completed. Start a new one with `/devloop`."
 4. Query Engram:
    - `mem_search "{engramProjectKey}"` to load strategic context
    - Summarize prior session context to the user before jumping to the saved phase
@@ -308,7 +308,7 @@ The user can type "pause" at ANY time during the workflow — not just at checkp
 1. Read `.dev-flow/state.json`
 2. Set `status` to `"paused"` and `metadata.lastPausedAt` to current timestamp
 3. Write updated state
-4. Tell the user: "Workflow paused at Phase {currentPhase}. Resume anytime with `/dev-flow continue`."
+4. Tell the user: "Workflow paused at Phase {currentPhase}. Resume anytime with `/devloop continue`."
 5. **Stop** — do not proceed with any further phase work
 
 ---
@@ -320,7 +320,7 @@ Every phase ends with a **checkpoint**. At each checkpoint, use AskUserQuestion 
 | Option | Action |
 |--------|--------|
 | **Continue** | Approve phase output, update state, proceed to next phase |
-| **Pause** | Save state, stop workflow. Resume with `/dev-flow continue` |
+| **Pause** | Save state, stop workflow. Resume with `/devloop continue` |
 | **End** | Skip remaining phases, generate completion report |
 
 Additionally, the user can type "pause" or "end" at any time during any phase (not just at checkpoints). Monitor for these keywords and handle accordingly.

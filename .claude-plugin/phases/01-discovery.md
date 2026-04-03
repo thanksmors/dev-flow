@@ -13,15 +13,15 @@ description: Understand what needs to be built, explore the problem space, and c
 
 Before anything else:
 
-1. Run `mem_search` with the project name and "dev-flow" to check for prior session context
+1. Run `mem_search` with the project name and "devloop" to check for prior session context
 2. Run `mem_search` with the feature name or description if provided
 3. If prior context found: summarize it for the user ("I found prior work on this: ...") and ask if it's relevant
-4. Set `metadata.engramProjectKey` in state.json to `dev-flow-{featureName}` (slugified)
+4. Set `metadata.engramProjectKey` in state.json to `devloop-{featureName}` (slugified)
 
 ### 1.1 Understand the Request
 
 - Read the user's original feature request / issue / description
-- If the user invoked `/dev-flow` with a description, use that as the starting point
+- If the user invoked `/devloop` with a description, use that as the starting point
 - If unclear, ask clarifying questions (one at a time, not a wall of questions):
   - What problem does this solve?
   - Who are the users?

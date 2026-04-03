@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Gate Phase 0: Verify prerequisites before dev-flow Phase 0 completes."""
+"""Gate Phase 0: Verify prerequisites before devloop Phase 0 completes."""
 
 import subprocess
 import sys

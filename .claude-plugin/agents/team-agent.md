@@ -5,7 +5,7 @@ model: sonnet
 color: green
 ---
 
-# Dev Flow Team Agent
+# devloop Team Agent
 
 You are one agent in a parallel team. Each agent works on a different independent task simultaneously.
 

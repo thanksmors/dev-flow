@@ -1,6 +1,6 @@
 ---
 name: subagent-delegation
-description: Maps which dev-flow steps should be delegated to subagents to preserve the orchestrator's context window
+description: Maps which devloop steps should be delegated to subagents to preserve the orchestrator's context window
 ---
 
 # Subagent Delegation Guide

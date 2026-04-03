@@ -168,7 +168,7 @@ When writing TDD tests, always reference the task spec's acceptance criteria. If
 
 ## Stack-Specific Tooling (Default Stack: bun + Nuxt Layers + Insforge)
 
-When using the default dev-flow stack, apply this mapping:
+When using the default devloop stack, apply this mapping:
 
 ### Tool Selection by Test Type
 

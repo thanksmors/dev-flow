@@ -517,7 +517,7 @@ const saga = new OrderOrchestrationSaga(inventoryService, paymentService, shippi
 await saga.execute('order_xyz789');
 ```
 
-### Saga in dev-flow Phase 4 Pre-mortem
+### Saga in devloop Phase 4 Pre-mortem
 
 When conducting a pre-mortem for distributed systems work in Phase 4, frame failures as:
 

@@ -110,7 +110,7 @@ For options 1, 2, or 4:
 
 For option 3:
 - Ensure state is saved
-- Remind user how to resume: `/dev-flow continue`
+- Remind user how to resume: `/devloop continue`
 
 ## Quality Gate
 
@@ -143,7 +143,7 @@ Before presenting the integration options, verify:
 
 After the user selects an integration option, execute it and confirm:
 
-"Dev Flow complete for **{feature name}**.
+"devloop complete for **{feature name}**.
 
 - Phases completed: {N}/8
 - Total tests: {N}

@@ -24,7 +24,7 @@ Reference: ${CLAUDE_PLUGIN_ROOT}/references/elephant-carpaccio.md
 For unknown territory, fire a tracer bullet — the simplest possible
 implementation of an uncertain path — before committing to it.
 
-# ${CLAUDE_PLUGIN_ROOT} resolves to the dev-flow plugin directory.
+# ${CLAUDE_PLUGIN_ROOT} resolves to the devloop plugin directory.
 # If reading this file from a project's .dev-flow/preferences/ copy,
 # find these references in the plugin's own references/ folder.
 

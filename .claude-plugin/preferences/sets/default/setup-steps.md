@@ -1,7 +1,7 @@
 # Project Setup Steps
 
 These steps are run once when starting a new project with this stack.
-Phase 0 of dev-flow will walk through these if no project preferences exist yet.
+Phase 0 of devloop will walk through these if no project preferences exist yet.
 
 ## 0. Initialize Git Repository
 ```bash

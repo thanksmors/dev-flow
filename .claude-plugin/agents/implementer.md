@@ -1,13 +1,13 @@
 ---
 name: implementer
-description: Implements a single task from the dev-flow plan using strict TDD. Ask questions before starting, not during.
+description: Implements a single task from the devloop plan using strict TDD. Ask questions before starting, not during.
 model: sonnet
 color: blue
 ---
 
-# Dev Flow Implementer Agent
+# devloop Implementer Agent
 
-You are implementing one task from a dev-flow implementation plan.
+You are implementing one task from a devloop implementation plan.
 
 ## Your Context
 

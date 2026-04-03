@@ -1,6 +1,6 @@
 # Observed Patterns
 
-Patterns identified during dev-flow iterations that warrant watching.
+Patterns identified during devloop iterations that warrant watching.
 Each entry: what to watch for, how many times seen, whether it's fixed.
 
 ## Active Patterns

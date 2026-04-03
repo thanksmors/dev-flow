@@ -15,7 +15,7 @@ Use a standard Mermaid sequenceDiagram for cross-container flows or when you don
 
 ## Syntax
 
-> **Note:** C4Dynamic requires the C4 plugin for Mermaid. In Structurizr DSL (which dev-flow uses for workspace.dsl), C4Dynamic is not used — use Structurizr's native component views instead. This reference applies when writing Mermaid C4 in markdown files.
+> **Note:** C4Dynamic requires the C4 plugin for Mermaid. In Structurizr DSL (which devloop uses for workspace.dsl), C4Dynamic is not used — use Structurizr's native component views instead. This reference applies when writing Mermaid C4 in markdown files.
 
 ### Diagram Declaration
 

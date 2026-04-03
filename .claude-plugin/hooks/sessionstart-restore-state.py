@@ -43,7 +43,7 @@ def format_restore_prompt(state: dict) -> str:
     if open_items:
         lines.append(f"Open items: {', '.join(open_items)}")
     lines.append("")
-    lines.append("Run `/dev-flow continue` to resume from where you left off.")
+    lines.append("Run `/devloop continue` to resume from where you left off.")
     return "\n".join(lines)
 
 def main() -> None:

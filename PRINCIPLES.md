@@ -1,4 +1,4 @@
-# Dev Flow — Core Principles
+# devloop — Core Principles
 
 These principles are non-negotiable. Every subagent, every phase, and every workflow dispatch operates under these rules. They override everything else.
 
