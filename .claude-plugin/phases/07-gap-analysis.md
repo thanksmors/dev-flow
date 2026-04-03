@@ -53,6 +53,9 @@ Analyze the implementation across these dimensions:
 - Test concurrent access (if applicable)
 - Test with malformed data
 
+> **ALWAYS consult Context7 when updating `docs/workspace.dsl`.**
+> If the gap analysis reveals that workspace.dsl is out of sync with the code, update workspace.dsl using the same Context7 workflow as Phase 6 Section 6.3 — resolve library ID for structurizrdsl, query specific syntax needed.
+
 **Architecture Gaps**
 - Do the actual components match the C4 diagrams?
 - Does the actual component structure in workspace.dsl match what was built? (new components added? relationships updated? obsolete components removed?)
